@@ -8,16 +8,17 @@ from cv_bridge import CvBridge
 
 from rosbags.highlevel import AnyReader
 import custom_message_definitions
+from point_cloud import extract_point_clouds_from_rosbag
 
 ################## PARAMETERS ##################
 
-INPUT_BAG = "/home/jean-michel/ros/bags/first_traversability_test/processed_bag"
-OUTPUT_FOLDER = "/home/jean-michel/ros/bags/first_traversability_test/export"
+INPUT_BAG = "/media/effie/SSD_JM/Data/FM_20231123/Bags/rosbag2_2023_11_23-11_32_46"
+OUTPUT_FOLDER = "/media/effie/SSD_JM/Data/FM_20231123/Bags/export_2023_11_23-11_32_46"
 BRACKETING_VALUES = np.array([1.0, 2.0, 4.0, 8.0, 16.0, 32.0])
 IMAGE_EXT = "png"
 TOPICS_TO_EXPORT = [
     {
-        "topic": "/lslidar_point_cloud",
+        "topic": "/rslidar32_points",
         "folder": "lidar",
         "type": "point_cloud"
     },
@@ -71,34 +72,12 @@ def check_output_folder(output_folder):
         os.makedirs(output_folder)
 
 
-def extract_point_clouds_from_rosbag(bag_file, topic_name, output_folder):
-    
-    os.makedirs(output_folder)
-    bridge = CvBridge()
-
-    with AnyReader([Path(bag_file)]) as reader:
-        # iterate over messages
-        print(f"Extracting point clouds from topic \"{topic_name}\" to folder \"{output_folder.split('/')[-1]}\"")
-        connections = [x for x in reader.connections if x.topic == topic_name]
-        for connection, _, rawdata in tqdm(reader.messages(connections=connections)):
-            msg = reader.deserialize(rawdata, connection.msgtype)
-            timestamp = msg.header.stamp.sec * 1e9 + msg.header.stamp.nanosec  
-            cv_image = bridge.imgmsg_to_cv2(msg, desired_encoding="passthrough")
-            if num_bits == 8:
-                cv_image.astype(np.uint8)
-            else:
-                cv_image.astype(np.uint16)
-            cv2.imwrite(os.path.join(output_folder, f"{int(timestamp):d}.{IMAGE_EXT}"), cv_image)
-
-    print(f"Done ! Exported point clouds to {output_folder}")
-
-
 def extract_images_from_rosbag(bag_file, topic_name, output_folder, num_bits=8):
     
     os.makedirs(output_folder)
     bridge = CvBridge()
 
-    with AnyReader([Path(bag_file)]) as reader:
+    with ([Path(bag_file)]) as reader:
         # iterate over messages
         print(f"Extracting images from topic \"{topic_name}\" to folder \"{output_folder.split('/')[-1]}\"")
         connections = [x for x in reader.connections if x.topic == topic_name]
@@ -235,7 +214,7 @@ def main():
             extract_audio_from_rosbag(INPUT_BAG, data['topic'], output_file)
 
         elif data['type'] == "point_cloud":
-            output_file = os.path.join(OUTPUT_FOLDER, data['filename'])
+            output_folder = os.path.join(OUTPUT_FOLDER, data['folder'])
             extract_point_clouds_from_rosbag(INPUT_BAG, data['topic'], output_folder)
 
 
