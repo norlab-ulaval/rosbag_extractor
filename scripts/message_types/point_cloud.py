@@ -27,9 +27,8 @@ def extract_point_clouds_from_rosbag(bag_file, topic_name, output_folder):
             df = pd.DataFrame()
             data = np.frombuffer(msg.data, dtype=np.uint8).reshape(-1, msg.point_step)
             for field in msg.fields:
-                print(field.name)
                 type = DATA_TYPES[field.datatype]
                 n_bytes = np.dtype(type).itemsize
-                df[field.name] = data[:, field.offset : field.offset + n_bytes].view(dtype=type).flatten()
+                df[field.name] = data[:, field.offset : field.offset + n_bytes].flatten().view(dtype=type)
             df.to_csv(os.path.join(output_folder, f"{int(timestamp):d}.csv"), index=False)
     print(f"Done ! Exported point clouds to {output_folder}")
