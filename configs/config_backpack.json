@@ -1,0 +1,29 @@
+[
+    {
+        "type": "gnss",
+        "topic": "/gps_data_raw", 
+        "filename": "gnss.csv"
+    },
+    {
+        "type": "imu",
+        "topic": "/MTI_imu/data", 
+        "filename": "imu.csv"
+    },
+    {
+        "type": "bracketing_image",
+        "topic": "/stereo/camera1/image_decompressed", 
+        "metadata_topic": "/stereo/camera1/metadata",
+        "folder": "camera_left",
+        "brackets": [1.0, 2.0, 4.0, 8.0, 16.0, 32.0],
+        "extension": "png"
+    },
+    {
+        "type": "bracketing_image",
+        "topic": "/stereo/camera2/image_decompressed", 
+        "metadata_topic": "/stereo/camera2/metadata",
+        "folder": "camera_right",
+        "brackets": [1.0, 2.0, 4.0, 8.0, 16.0, 32.0],
+        "extension": "png"
+    }
+]
+

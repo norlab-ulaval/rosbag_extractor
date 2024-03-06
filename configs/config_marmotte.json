@@ -1,0 +1,58 @@
+[
+    {
+        "type": "basic",
+        "topic": "/left_encoder_angular_velocity",
+        "filename": "left_wheel_velocity.csv"
+    },
+    {
+        "type": "basic",
+        "topic": "/right_encoder_angular_velocity",
+        "filename": "right_wheel_velocity.csv"
+    },
+    {
+        "type": "odometry",
+        "topic": "/icp_odom",
+        "filename": "icp_odom.csv"
+    },
+    {
+        "type": "odometry",
+        "topic": "/odom_roboclaw",
+        "filename": "wheel_odom.csv"
+    },
+    {
+        "type": "odometry",
+        "topic": "/imu_and_wheel_odom",
+        "filename": "imu_and_wheel_odom.csv"
+    },
+    {
+        "type": "rectified_image",
+        "topic": "/zed_node/left_raw/image_raw_color",
+        "calibration": "/zed_node/left_raw/camera_info",
+        "folder": "camera_left",
+        "extension": "png"
+    },
+    {
+        "type": "rectified_image",
+        "topic": "/zed_node/right_raw/image_raw_color",
+        "calibration": "/zed_node/right_raw/camera_info",
+        "folder": "camera_right",
+        "extension": "png"
+        
+    },
+    {
+        "type": "point_cloud",
+        "topic": "/lslidar_point_cloud",
+        "folder": "lidar"
+    },
+    {
+        "type": "audio",
+        "topic": "/audio/audio_stamped",
+        "filename": "audio.mp3"
+    },
+    {
+        "type": "imu",
+        "topic": "/MTI_imu/data", 
+        "filename": "imu.csv"
+    }
+]
+
