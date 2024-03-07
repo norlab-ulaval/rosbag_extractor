@@ -67,7 +67,9 @@ def check_requested_topics(bag_file, config_dict):
 
 def extract_rosbag_data(input_bag, config_dict, output_folder):  
 
-    config_dict = check_requested_topics(INPUT_BAG, config_dict)
+    print("-------------------------------------------------")
+    print(f"Extracting rosbag {input_bag.split('/')[-1]}")
+    config_dict = check_requested_topics(input_bag, config_dict)
     os.makedirs(output_folder, exist_ok=True)
 
     for data in config_dict:
