@@ -1,5 +1,4 @@
 import os, shutil
-import numpy as np
 from pathlib import Path
 from rosbags.highlevel import AnyReader
 import json
@@ -14,12 +13,22 @@ from message_types.basic import extract_basic_data_from_rosbag
 
 ################## PARAMETERS ##################
 
-INPUT_BAG = "/run/user/1000/gvfs/afp-volume:host=bucheron.local,user=norlab_admin,volume=home/olivier_gamache/dataset/forest_04-20-2023/bagfiles/backpack_2023-04-20-09-29-14.bag"
+# INPUT_BAG = "/run/user/1000/gvfs/afp-volume:host=bucheron.local,user=norlab_admin,volume=home/olivier_gamache/dataset/forest_04-20-2023/bagfiles/backpack_2023-04-20-09-29-14.bag"
+INPUT_BAG = "/home/jean-michel/ros/bags/active_probing_parking/merged_2024-02-18_15-01-58_processed"
 OUTPUT_FOLDER = "/home/jean-michel/Desktop/test"
-CONFIG_FILE = os.path.join(os.path.dirname(__file__), "../configs/config_backpack.json")
+CONFIG_FILE = os.path.join(os.path.dirname(__file__), "../configs/config_marmotte.json")
 
 ################################################
 
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    
 
 def load_config(config_file):
 
@@ -39,20 +48,26 @@ def check_output_folder(output_folder):
         os.makedirs(output_folder)
 
 
-def check_requested_topics(bag_file, requested_topics):
+def check_requested_topics(bag_file, config_dict):
 
     with AnyReader([Path(bag_file)]) as reader:
         bag_topics = set([x.topic for x in reader.connections])
 
-    for topic in requested_topics:
-        if topic not in bag_topics:
-            print(f"[WARNING] Topic {topic} not found in bag file, available topics are {bag_topics}")
+    new_config_dict = []
+    for data in config_dict:
+        topic_name = data["topic"]
+        if topic_name not in bag_topics:
+            print(f"{bcolors.FAIL}Topic {topic_name} not found in bag file, removed from config.{bcolors.ENDC}")
         else:
-            print(f"Topic {topic} will be extracted.")
+            new_config_dict.append(data)
+            print(f"{bcolors.OKGREEN}Topic {topic_name} will be extracted.{bcolors.ENDC}")
+
+    return new_config_dict
 
 
 def extract_rosbag_data(input_bag, config_dict, output_folder):  
 
+    config_dict = check_requested_topics(INPUT_BAG, config_dict)
     os.makedirs(output_folder, exist_ok=True)
 
     for data in config_dict:
@@ -100,7 +115,6 @@ def extract_rosbag_data(input_bag, config_dict, output_folder):
 def main():
 
     config_dict = load_config(CONFIG_FILE)
-    check_requested_topics(INPUT_BAG, [data['topic'] for data in config_dict])
     check_output_folder(OUTPUT_FOLDER)
     
     extract_rosbag_data(INPUT_BAG, config_dict, OUTPUT_FOLDER)

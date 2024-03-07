@@ -22,7 +22,6 @@ def main():
 
     if len(INPUT_BAGS) > 0:
         for bag_file in INPUT_BAGS:
-            check_requested_topics(bag_file, [x['topic'] for x in config_dict])
             output_folder = os.path.join(OUTPUT_FOLDER, bag_file.split(".")[0])
             extract_rosbag_data(bag_file, config_dict, output_folder)
 
@@ -31,7 +30,6 @@ def main():
             for bag_file in os.listdir(INPUT_FOLDER):
                 output_folder = os.path.join(OUTPUT_FOLDER, bag_file.split(".")[0])
                 bag_file = os.path.join(INPUT_FOLDER, bag_file)
-                # check_requested_topics(bag_file, [x['topic'] for x in config_dict])
                 extract_rosbag_data(bag_file, config_dict, output_folder)
 
 

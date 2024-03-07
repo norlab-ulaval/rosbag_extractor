@@ -6,6 +6,11 @@
     },
     {
         "type": "basic",
+        "topic": "/allo",
+        "filename": "right_wheel_velocity.csv"
+    },
+    {
+        "type": "basic",
         "topic": "/right_encoder_angular_velocity",
         "filename": "right_wheel_velocity.csv"
     },
