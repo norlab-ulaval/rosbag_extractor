@@ -49,8 +49,8 @@ def extract_images_from_rosbag(bag_file, topic_name, output_folder, image_ext="p
             msg = reader.deserialize(rawdata, connection.msgtype)
             timestamp = msg.header.stamp.sec * 1e9 + msg.header.stamp.nanosec  
             np_image = image_to_numpy(msg)
-            if "bgr" in msg.encoding:
-                np_image = cv2.cvtColor(np_image, cv2.COLOR_RGB2BGR)
+            # if "bgr" in msg.encoding:
+            #     np_image = cv2.cvtColor(np_image, cv2.COLOR_RGB2BGR)
             if rectify:
                 np_image = cv2.undistort(np_image, camera_info_K, camera_info_D)  
             cv2.imwrite(os.path.join(output_folder, f"{int(timestamp):d}.{image_ext}"), np_image)

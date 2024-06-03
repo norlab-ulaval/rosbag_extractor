@@ -14,8 +14,8 @@ from message_types.basic import extract_basic_data_from_rosbag
 ################## PARAMETERS ##################
 
 # INPUT_BAG = "/run/user/1000/gvfs/afp-volume:host=bucheron.local,user=norlab_admin,volume=home/olivier_gamache/dataset/forest_04-20-2023/bagfiles/backpack_2023-04-20-09-29-14.bag"
-INPUT_BAG = "/home/jean-michel/ros/bags/active_probing_parking/merged_2024-02-18_15-01-58_processed"
-OUTPUT_FOLDER = "/home/jean-michel/Desktop/test"
+INPUT_BAG = "/media/jean-michel/SSD_JM/Data/UL_20240416/merged_2024-04-16_09-57-31"
+OUTPUT_FOLDER = "/media/jean-michel/SSD_JM/Data/UL_20240416/exported_2024-04-16_09-57-31"
 CONFIG_FILE = os.path.join(os.path.dirname(__file__), "../configs/config_marmotte.json")
 
 ################################################
