@@ -22,14 +22,16 @@ def main():
 
     if len(INPUT_BAGS) > 0:
         for bag_file in INPUT_BAGS:
+            output_folder = os.path.join(OUTPUT_FOLDER, bag_file.split(".")[0])
             rosbag_extractor = RosbagExtractor(bag_file, config_dict)
-            rosbag_extractor.extract_data(OUTPUT_FOLDER, overwrite=True)
+            rosbag_extractor.extract_data(output_folder, overwrite=True)
 
     elif len(INPUT_FOLDERS) > 0:
         for INPUT_FOLDER in INPUT_FOLDERS:
             for bag_file in os.listdir(INPUT_FOLDER):
+                output_folder = os.path.join(OUTPUT_FOLDER, bag_file.split(".")[0])
                 rosbag_extractor = RosbagExtractor(bag_file, config_dict)
-                rosbag_extractor.extract_data(OUTPUT_FOLDER, overwrite=True)
+                rosbag_extractor.extract_data(output_folder, overwrite=True)
 
 
 if __name__ == "__main__":
