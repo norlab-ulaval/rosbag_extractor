@@ -1,8 +1,0 @@
-[
-    {
-        "type": "gnss",
-        "topic": "/gps_data_raw", 
-        "filename": "gnss.csv"
-    }
-]
-

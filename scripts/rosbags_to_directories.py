@@ -1,6 +1,7 @@
 import os
 
-from extract_data_from_rosbag import extract_rosbag_data, check_output_folder, check_requested_topics, load_config
+from rosbag_extractor import RosbagExtractor
+from rosbag_to_directory import load_config
 
 ################## PARAMETERS ##################
 
@@ -18,19 +19,17 @@ CONFIG_FILE = os.path.join(os.path.dirname(__file__), "../configs/config_backpac
 def main():
     
     config_dict = load_config(CONFIG_FILE)
-    check_output_folder(OUTPUT_FOLDER)
 
     if len(INPUT_BAGS) > 0:
         for bag_file in INPUT_BAGS:
-            output_folder = os.path.join(OUTPUT_FOLDER, bag_file.split(".")[0])
-            extract_rosbag_data(bag_file, config_dict, output_folder)
+            rosbag_extractor = RosbagExtractor(bag_file, config_dict)
+            rosbag_extractor.extract_data(OUTPUT_FOLDER, overwrite=True)
 
     elif len(INPUT_FOLDERS) > 0:
         for INPUT_FOLDER in INPUT_FOLDERS:
             for bag_file in os.listdir(INPUT_FOLDER):
-                output_folder = os.path.join(OUTPUT_FOLDER, bag_file.split(".")[0])
-                bag_file = os.path.join(INPUT_FOLDER, bag_file)
-                extract_rosbag_data(bag_file, config_dict, output_folder)
+                rosbag_extractor = RosbagExtractor(bag_file, config_dict)
+                rosbag_extractor.extract_data(OUTPUT_FOLDER, overwrite=True)
 
 
 if __name__ == "__main__":

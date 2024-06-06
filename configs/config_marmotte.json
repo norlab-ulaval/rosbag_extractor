@@ -1,63 +1,75 @@
 [
     {
         "type": "basic",
-        "topic": "/left_encoder_angular_velocity",
-        "filename": "left_wheel_velocity.csv"
+        "topic": "/motors/left/encoder",
+        "folder": "left_encoder",
+        "extension": "csv"
     },
     {
         "type": "basic",
-        "topic": "/allo",
-        "filename": "right_wheel_velocity.csv"
+        "topic": "/motors/right/encoder",
+        "folder": "right_encoder",
+        "extension": "csv"
     },
     {
         "type": "basic",
-        "topic": "/right_encoder_angular_velocity",
-        "filename": "right_wheel_velocity.csv"
+        "topic": "/motors/left/electrical",
+        "folder": "left_electrical",
+        "extension": "csv"
+    },    
+    {
+        "type": "basic",
+        "topic": "/motors/right/electrical",
+        "folder": "right_electrical",
+        "extension": "csv"
     },
     {
         "type": "odometry",
         "topic": "/icp_odom",
-        "filename": "icp_odom.csv"
+        "folder": "icp_odom",
+        "extension": "csv"
     },
     {
         "type": "odometry",
-        "topic": "/odom_roboclaw",
-        "filename": "wheel_odom.csv"
+        "topic": "/motors/odometry",
+        "folder": "wheel_odom",
+        "extension": "csv"
     },
     {
         "type": "odometry",
         "topic": "/imu_and_wheel_odom",
-        "filename": "imu_and_wheel_odom.csv"
+        "folder": "imu_and_wheel_odom",
+        "extension": "csv"
     },
     {
         "type": "rectified_image",
         "topic": "/zed_node/left_raw/image_raw_color",
-        "calibration": "/zed_node/left_raw/camera_info",
         "folder": "camera_left",
         "extension": "png"
     },
     {
         "type": "rectified_image",
         "topic": "/zed_node/right_raw/image_raw_color",
-        "calibration": "/zed_node/right_raw/camera_info",
-        "folder": "camera_right",
-        "extension": "png"
-        
+        "folder": "camera_right",  
+        "extension": "png"      
     },
     {
         "type": "point_cloud",
         "topic": "/lslidar_point_cloud",
-        "folder": "lidar"
+        "folder": "lidar",
+        "extension": "csv"
     },
     {
         "type": "audio",
         "topic": "/audio/audio_stamped",
-        "filename": "audio.mp3"
+        "folder": "audio",
+        "extension": "mp3"
     },
     {
         "type": "imu",
         "topic": "/MTI_imu/data", 
-        "filename": "imu.csv"
+        "folder": "imu",
+        "extension": "csv"
     }
 ]
 
