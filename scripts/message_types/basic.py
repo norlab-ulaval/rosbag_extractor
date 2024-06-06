@@ -25,7 +25,7 @@ def extract_basic_data_from_rosbag(bag_file, topic_name, output_file):
 
             # Add the header information if available
             if msg_dict.get("header"):
-                timestamp = msg.header.stamp.sec * 1e9 + msg.header.stamp.nanosec
+                timestamp = int(msg.header.stamp.sec * 1e9 + msg.header.stamp.nanosec)
                 frame_id = msg.header.frame_id
                 data = [ros_time, timestamp, frame_id]
             else:
