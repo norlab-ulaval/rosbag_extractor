@@ -94,7 +94,7 @@ class RosbagExtractor:
 
             elif data['type'] == "bracketing_image":
                 extract_images_from_rosbag(self.bag_file, data['topic'], data_folder, data['extension'])
-                sort_bracket_images(self.bag_file, data['metadata_topic'], data_folder, data['brackets'], data['extension'])
+                sort_bracket_images(self.bag_file, data['topic'], data_folder, data['extension'], data["args"])
 
 
     def _create_output_folder(self, overwrite=False):
@@ -112,6 +112,8 @@ class RosbagExtractor:
 
         with AnyReader([Path(self.bag_file)]) as reader:
             bag_topics = set([x.topic for x in reader.connections])
+
+        print(f"Topics found in bag file: {bag_topics}")
 
         for data in self.config:
             topic_name = data["topic"]

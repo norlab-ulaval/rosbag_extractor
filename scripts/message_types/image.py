@@ -90,9 +90,12 @@ def image_to_numpy(msg):
     return data
 
 
-def sort_bracket_images(bag_file, metadata_topic, images_folder, bracketing_values, image_ext="png"):
+def sort_bracket_images(bag_file, image_topic, images_folder, image_ext, args):
+
+    metadata_topic = "/".join(image_topic.split('/')[:-1] + ["metadata"])
+    brackets = np.array(args["brackets"])
     
-    for bracketing_value in bracketing_values:
+    for bracketing_value in brackets:
         os.mkdir(os.path.join(images_folder, f"{bracketing_value:.1f}"))
         
     with AnyReader([Path(bag_file)]) as reader:
@@ -102,8 +105,8 @@ def sort_bracket_images(bag_file, metadata_topic, images_folder, bracketing_valu
         for connection, _, rawdata in tqdm(reader.messages(connections=connections)):
             msg = reader.deserialize(rawdata, connection.msgtype)
             timestamp = msg.header.stamp.sec * 1e9 + msg.header.stamp.nanosec
-            idx = (np.abs(bracketing_values - msg.ExposureTime)).argmin()
-            bracketing_value = bracketing_values[idx]
+            idx = (np.abs(brackets - msg.ExposureTime)).argmin()
+            bracketing_value = brackets[idx]
             image_name = f"{int(timestamp):d}.{image_ext}"
             image_path = Path(images_folder, image_name)
             if os.path.exists(image_path):
