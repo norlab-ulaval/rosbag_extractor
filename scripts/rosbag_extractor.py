@@ -85,16 +85,19 @@ class RosbagExtractor:
 
             elif data['type'] == "point_cloud":
                 extract_point_clouds_from_rosbag(self.bag_file, data['topic'], data_folder)
+                
+            elif data['type'] == "image":
+                extract_images_from_rosbag(self.bag_file, data['topic'], data_folder, data['args'], data['extension'])
 
-            elif data['type'] == "raw_image":
-                extract_images_from_rosbag(self.bag_file, data['topic'], data_folder, data['extension'])     
+            # elif data['type'] == "raw_image":
+            #     extract_images_from_rosbag(self.bag_file, data['topic'], data_folder, data['extension'])     
 
-            elif data['type'] == "rectified_image":
-                extract_images_from_rosbag(self.bag_file, data['topic'], data_folder, data['extension'], rectify=True)
+            # elif data['type'] == "rectified_image":
+            #     extract_images_from_rosbag(self.bag_file, data['topic'], data_folder, data['extension'], rectify=True)
 
-            elif data['type'] == "bracketing_image":
-                extract_images_from_rosbag(self.bag_file, data['topic'], data_folder, data['extension'])
-                sort_bracket_images(self.bag_file, data['topic'], data_folder, data['extension'], data["args"])
+            # elif data['type'] == "bracketing_image":
+            #     extract_images_from_rosbag(self.bag_file, data['topic'], data_folder, data['extension'])
+            #     sort_bracket_images(self.bag_file, data['topic'], data_folder, data['extension'], data["args"])
 
 
     def _create_output_folder(self, overwrite=False):

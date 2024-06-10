@@ -4,3 +4,5 @@ pandas
 pathlib
 rosbags
 tqdm
+pillow
+glymur

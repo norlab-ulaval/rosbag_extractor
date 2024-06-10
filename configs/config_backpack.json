@@ -1,10 +1,16 @@
 [
     {
-        "type": "bracketing_image",
+        "type": "image",
         "topic": "/stereo/camera1/image_decompressed", 
         "folder": "camera_left",
-        "extension": "png",
+        "extension": "jp2",
         "args": {
+            "rectify": false,
+            "scaling_factor": 0.5,
+            "quality_factor": 1,
+            "gray_scale": true,
+            "remove_bayer_pattern": true,
+            "convert_12bits_to_8bits": false,
             "brackets": [1.0, 2.0, 4.0, 8.0, 16.0, 32.0]
         }
     }

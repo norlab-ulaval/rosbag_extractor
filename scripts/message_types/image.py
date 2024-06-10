@@ -4,6 +4,9 @@ from pathlib import Path
 from rosbags.highlevel import AnyReader
 from tqdm import tqdm
 import cv2
+from PIL import Image
+import glymur
+from glymur import Jp2k
 
 ENCODINGS = {  # COMMENTED ENCODINGS ARE NOT TESTED
     "rgb8":    (np.uint8,  3),
@@ -29,10 +32,11 @@ ENCODINGS = {  # COMMENTED ENCODINGS ARE NOT TESTED
 }
 
 
-def extract_images_from_rosbag(bag_file, topic_name, output_folder, image_ext="png", rectify=False):
-        
+def extract_images_from_rosbag(bag_file, topic_name, output_folder, args, image_ext="png"):
+    if "quality_factor" in args and args["quality_factor"] < 1 and image_ext == "png":
+        raise ValueError("Quality factor can not be used with PNG images.")
     with AnyReader([Path(bag_file)]) as reader:
-        if rectify:
+        if args['rectify']:
             K, D = get_camera_calibration_matrix(reader, topic_name)
 
         # iterate over messages
@@ -42,11 +46,29 @@ def extract_images_from_rosbag(bag_file, topic_name, output_folder, image_ext="p
             msg = reader.deserialize(rawdata, connection.msgtype)
             timestamp = msg.header.stamp.sec * 1e9 + msg.header.stamp.nanosec  
             np_image = image_to_numpy(msg)
+            if "remove_bayer_pattern" in args and args["remove_bayer_pattern"]:
+                np_image = cv2.cvtColor(np_image, cv2.COLOR_BayerRG2RGB)
             if "rgb" in msg.encoding:
                 np_image = cv2.cvtColor(np_image, cv2.COLOR_RGB2BGR)
-            if rectify:
-                np_image = cv2.undistort(np_image, K, D)  
-            cv2.imwrite(os.path.join(output_folder, f"{int(timestamp):d}.{image_ext}"), np_image)
+            if "convert_12bits_to_8bits" in args and args["convert_12bits_to_8bits"]:
+                np_image = (np_image/16).astype(np.uint8)
+            if args['rectify']:
+                np_image = cv2.undistort(np_image, K, D)
+            if "gray_scale" in args and args["gray_scale"]:
+                np_image = cv2.cvtColor(np_image, cv2.COLOR_RGB2GRAY)
+            if "scaling_factor" in args:
+                np_image = cv2.resize(np_image, (int(np_image.shape[1]*args["scaling_factor"]), int(np_image.shape[0]*args["scaling_factor"])), interpolation=cv2.INTER_AREA)
+            if "quality_factor" in args:
+                # cv2.imwrite(os.path.join(output_folder, f"{int(timestamp):d}.{image_ext}"), np_image, [int(cv2.IMWRITE_JPEG_QUALITY), int(args["quality_factor"]*100)])
+                jp2 = Jp2k(os.path.join(output_folder, f"{int(timestamp):d}.{image_ext}"), data=np_image, cratios=[args["quality_factor"]])
+                # cv2.imwrite(os.path.join(output_folder, f"{int(timestamp):d}.{image_ext}"), np_image)
+            else:
+                cv2.imwrite(os.path.join(output_folder, f"{int(timestamp):d}.{image_ext}"), np_image)
+                # image = Image.fromarray(np_image)
+                # jp2 = Jp2k(os.path.join(output_folder, f"{int(timestamp):d}.{image_ext}"), data=np_image, cratios=[5])
+        
+    if "brackets" in args:
+        sort_bracket_images(bag_file, topic_name, output_folder, image_ext, args)
 
     print(f"Done ! Exported images to {output_folder}")
 
@@ -54,7 +76,7 @@ def extract_images_from_rosbag(bag_file, topic_name, output_folder, image_ext="p
 def get_camera_calibration_matrix(reader, topic_name):
     """Extract camera calibration matrix from rosbag."""
 
-    camera_info_topic = "/".join(topic_name.split('/')[:-1] + ["camera_info"])  
+    camera_info_topic = "/".join(topic_name.split('/')[:-1] + ["camera_info"])
     connections = [x for x in reader.connections if x.topic == camera_info_topic] 
 
     if not connections:
@@ -62,8 +84,12 @@ def get_camera_calibration_matrix(reader, topic_name):
 
     for connection, _, rawdata in reader.messages(connections=connections):
         camera_info = reader.deserialize(rawdata, connection.msgtype)
-        K = np.array(camera_info.k).reshape([3, 3])
-        D = np.array(camera_info.d)
+        try:
+            K = np.array(camera_info.k).reshape([3, 3])
+            D = np.array(camera_info.d)
+        except:
+            K = np.array(camera_info.K).reshape([3, 3])
+            D = np.array(camera_info.D)
         break  
 
     return K, D
