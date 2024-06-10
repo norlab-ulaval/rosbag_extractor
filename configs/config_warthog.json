@@ -1,0 +1,9 @@
+[
+    {
+        "type": "odometry",
+        "topic": "/icp_odom",
+        "folder": "icp_odom",
+        "extension": "csv"
+    }
+]
+
