@@ -4,6 +4,18 @@
         "topic": "/icp_odom",
         "folder": "icp_odom",
         "extension": "csv"
+    },
+    {
+        "type": "rectified_image",
+        "topic": "/zed_node/left_raw/image_raw_color",
+        "folder": "camera_left",
+        "extension": "png"
+    },
+    {
+        "type": "imu",
+        "topic": "/MTI_imu/data", 
+        "folder": "imu",
+        "extension": "csv"
     }
 ]
 
