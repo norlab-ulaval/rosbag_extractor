@@ -1,6 +1,9 @@
 import os
 import json
 from rosbag_extractor import RosbagExtractor
+from pathlib import Path
+from typing import Union
+
 
 ################## PARAMETERS ##################
 
@@ -12,14 +15,12 @@ CONFIG_FILE = os.path.join(os.path.dirname(__file__), "../configs/config_warthog
 ################################################
 
 
-def load_config(config_file):
+def load_config(config_file: Union[Path, str]) -> dict:
+    config_path = Path(config_file)
+    return json.loads(config_path.read_text(encoding="utf-8"))
 
-    config_file = open(config_file, "r")
-    return json.load(config_file)
-    
 
-def main(): 
-
+def main():
     config = load_config(CONFIG_FILE)
     rosbag_extractor = RosbagExtractor(INPUT_BAG, config)
     rosbag_extractor.extract_data(OUTPUT_FOLDER, overwrite=True, ignore_missing=True)
