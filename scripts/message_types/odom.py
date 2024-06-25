@@ -27,10 +27,17 @@ def extract_odom_from_rosbag(bag_file, topic_name, output_file):
                 msg.pose.pose.position.z,
                 roll,
                 pitch,
-                yaw
+                yaw,
+                msg.twist.twist.linear.x,
+                msg.twist.twist.linear.y,
+                msg.twist.twist.linear.z,
+                msg.twist.twist.angular.x,
+                msg.twist.twist.angular.y,
+                msg.twist.twist.angular.z
             ])
             
-        odom_df = pd.DataFrame(odom_data, columns=["timestamp", "ros_time", "x", "y", "z", "roll", "pitch", "yaw"])
+        odom_df = pd.DataFrame(odom_data, columns=["timestamp", "ros_time", "x", "y", "z", "roll", "pitch", "yaw",
+                                                   "vel_x", "vel_y", "vel_z", "vel_roll", "vel_pitch", "vel_yaw"])
         odom_df.to_csv(output_file, index=False)
 
     print(f"Done ! Exported odometry to {output_file}")

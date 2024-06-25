@@ -6,9 +6,21 @@
         "extension": "csv"
     },
     {
-        "type": "rectified_image",
+        "type": "odometry",
+        "topic": "/warthog_velocity_controller/odom",
+        "folder": "wheel_odom",
+        "extension": "csv"
+    },
+    {
+        "type": "raw_image",
         "topic": "/zed_node/left_raw/image_raw_color",
         "folder": "camera_left",
+        "extension": "png"
+    },
+    {
+        "type": "raw_image",
+        "topic": "/zed_node/right_raw/image_raw_color",
+        "folder": "camera_right",
         "extension": "png"
     },
     {
