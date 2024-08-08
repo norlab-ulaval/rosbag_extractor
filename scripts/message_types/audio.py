@@ -1,9 +1,9 @@
-import pandas as pd
 from pathlib import Path
-from tqdm import tqdm
-from rosbags.highlevel import AnyReader
 
+import pandas as pd
+from rosbags.highlevel import AnyReader
 from rosbags.typesys import get_types_from_msg, register_types
+from tqdm import tqdm
 
 # Audio message
 AUDIO_DATA_MSG = """
@@ -33,5 +33,3 @@ def extract_audio_from_rosbag(bag_file, topic_name, output_file):
                 mp3_file.write(b"".join(msg.audio.data))
             else:
                 print(f"Unknown audio message type: {connection.msgtype}")
-
-    print(f"Done ! Exported audio to {output_file}")
