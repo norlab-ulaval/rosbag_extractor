@@ -9,15 +9,17 @@ from rosbag_extractor import RosbagExtractor
 
 ################## PARAMETERS ##################
 
-INPUT_BAG = "/media/jean-michel/SSD_JM/Data/UL_20240806/merged_2024_08_06-10_51_13"
-OUTPUT_FOLDER = "/home/jean-michel/repos/self_supervised_traversability/data/warthog4"
+INPUT_BAG = "/media/jean-michel/SSD_JM/Data/UL_20240806/merged_2024_08_06-11_15_56"
+OUTPUT_FOLDER = "/home/jean-michel/repos/self_supervised_traversability/data/warthog6"
 CONFIG = "warthog"  # Config file name without extension, should exist in the configs folder
 
 ################################################
 
 
 def load_config(name) -> dict:
-    config_path = os.path.join(os.path.dirname(__file__), "..", "configs", f"{name}.yaml")
+    if not name.endswith(".yaml"):
+        name += ".yaml"
+    config_path = os.path.join(os.path.dirname(__file__), "..", "configs", f"{name}")
     return yaml.safe_load(open(config_path))
 
 

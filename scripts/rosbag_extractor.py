@@ -55,7 +55,10 @@ class RosbagExtractor:
 
         for data in self.config:
 
-            data_folder = os.path.join(self.output_folder, data["folder"])
+            if data["folder"]:
+                data_folder = os.path.join(self.output_folder, data["folder"])
+            else:
+                data_folder = self.output_folder
             os.makedirs(data_folder, exist_ok=True)
 
             output_file = os.path.join(data_folder, f"{data['folder']}.{data['extension']}")
