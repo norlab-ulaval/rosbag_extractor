@@ -8,12 +8,22 @@
   folder: wheel_odom
   extension: csv
 
-- type: rectified_image
-  topic: /zed_node/left_raw/image_raw_color
-  folder: camera_left
-  extension: png
+- type: odometry
+  topic: /gnss_imu_odom
+  folder: rtk_odom
+  extension: csv
 
 - type: imu
   topic: /mti30/data
   folder: imu
+  extension: csv
+
+- type: rectified_image
+  topic: /zed_node/left_raw/image_raw_color
+  folder: ground_images
+  extension: png
+
+- type: basic
+  topic: /battery_logs
+  folder: power
   extension: csv
