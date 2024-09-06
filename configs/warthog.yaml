@@ -9,7 +9,7 @@
   extension: csv
 
 - type: odometry
-  topic: /gnss_imu_odom
+  topic: /reachrs/tessellate/odom
   folder: rtk_odom
   extension: csv
 

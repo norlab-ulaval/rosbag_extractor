@@ -101,14 +101,19 @@ class RosbagExtractor:
         with AnyReader([Path(self.bag_file)]) as reader:
             bag_topics = set([x.topic for x in reader.connections])
 
-        for data in self.config:
+        to_remove = []
+        for i, data in enumerate(self.config):
             topic_name = data["topic"]
             if topic_name not in bag_topics:
                 if ignore_missing:
                     print(
                         f"{bcolors.WARNING}Warning: Topic {topic_name} not found in bag file. Ignoring...{bcolors.ENDC}"
                     )
-                    self.config.remove(data)
+                    to_remove.append(i)
                     continue
                 else:
                     raise Exception(f"Topic {topic_name} not found in bag file.")
+
+        to_remove.sort(reverse=True)
+        for i in to_remove:
+            self.config.pop(i)
