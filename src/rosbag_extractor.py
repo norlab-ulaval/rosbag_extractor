@@ -1,15 +1,14 @@
 import os
 from pathlib import Path
 
-import numpy as np
-from message_types.audio import extract_audio_from_rosbag
-from message_types.basic import extract_basic_data_from_rosbag
-from message_types.gnss import extract_gnss_from_rosbag
-from message_types.image import extract_images_from_rosbag, sort_bracket_images
-from message_types.imu import extract_imu_from_rosbag
-from message_types.odom import extract_odom_from_rosbag
-from message_types.point_cloud import extract_point_clouds_from_rosbag
 from rosbags.highlevel import AnyReader
+from src.types.audio import extract_audio_from_rosbag
+from src.types.basic import extract_basic_data_from_rosbag
+from src.types.gnss import extract_gnss_from_rosbag
+from src.types.image import extract_images_from_rosbag, sort_bracket_images
+from src.types.imu import extract_imu_from_rosbag
+from src.types.odom import extract_odom_from_rosbag
+from src.types.point_cloud import extract_point_clouds_from_rosbag
 
 ########## EXAMPLE OF CONFIG FILE ##########
 
