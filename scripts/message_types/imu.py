@@ -28,4 +28,4 @@ def extract_imu_from_rosbag(bag_file, topic_name, output_file):
         imu_df = pd.DataFrame(imu_data, columns=["timestamp", "ros_time", "gyro_x", "gyro_y", "gyro_z", "acc_x", "acc_y", "acc_z"])
         imu_df.to_csv(output_file, index=False)
 
-    print(f"Done ! Exported images to {output_file}")
+    print(f"Done ! Exported imu data to {output_file}")

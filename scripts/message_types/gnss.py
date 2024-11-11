@@ -25,4 +25,4 @@ def extract_gnss_from_rosbag(bag_file, topic_name, output_file):
         imu_df = pd.DataFrame(gnss_data, columns=["timestamp", "ros_time", "latitude", "longitude", "altitude"])
         imu_df.to_csv(output_file, index=False)
 
-    print(f"Done ! Exported images to {output_file}")
+    print(f"Done ! Exported gnss data to {output_file}")
