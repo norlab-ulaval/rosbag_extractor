@@ -1,18 +1,79 @@
 [
     {
+        "type":"imu",
+        "topic": "/MTI_imu/data",
+        "folder": "imu",
+        "extension": "csv"
+    },
+    {
+        "type":"gnss",
+        "topic": "/gps_data_raw",
+        "folder": "gnss",
+        "extension": "csv"
+    },
+    {
+        "type": "basic",
+        "topic": "/nmea_sentence",
+        "folder": "gnss_nmea_raw",
+        "extension": "csv"
+    },
+    {
+        "type":"point_cloud",
+        "topic": "/velodyne_points",
+        "folder": "lidar",
+        "extension": "csv"
+    },
+    {
+        "type": "basic",
+        "topic": "/stm32_parameters",
+        "folder": "stm32_parameters",
+        "extension": "csv"
+    },
+    {
         "type": "image",
         "topic": "/stereo/camera1/image_decompressed", 
         "folder": "camera_left",
-        "extension": "jp2",
+        "extension": "png",
         "args": {
             "rectify": false,
-            "scaling_factor": 0.5,
-            "quality_factor": 1,
-            "gray_scale": true,
-            "remove_bayer_pattern": true,
+            "scaling_factor": 1.0,
+            "gray_scale": false,
+            "remove_bayer_pattern": false,
             "convert_12bits_to_8bits": false,
             "brackets": [1.0, 2.0, 4.0, 8.0, 16.0, 32.0]
         }
+    },
+    {
+        "type": "basic",
+        "topic": "/stereo/camera1/metadata",
+        "folder": "camera_left_metadata",
+        "extension": "csv"
+    },
+    {
+        "type": "image",
+        "topic": "/stereo/camera2/image_decompressed", 
+        "folder": "camera_right",
+        "extension": "png",
+        "args": {
+            "rectify": false,
+            "scaling_factor": 1.0,
+            "gray_scale": false,
+            "remove_bayer_pattern": false,
+            "convert_12bits_to_8bits": false,
+            "brackets": [1.0, 2.0, 4.0, 8.0, 16.0, 32.0]
+        }
+    },
+    {
+        "type": "basic",
+        "topic": "/stereo/camera2/metadata",
+        "folder": "camera_right_metadata",
+        "extension": "csv"
+    },
+    {
+        "type": "basic",
+        "topic": "/stereo/static_parameters",
+        "folder": "camera_static_parameters",
+        "extension": "csv"
     }
 ]
 
