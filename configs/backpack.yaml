@@ -32,7 +32,7 @@
     scale: 1.0
     debayer: false
     convert_12to8bits: false
-    brackets: [25, 100, 400, 1600, 6400, 25600]
+    brackets: [1.0, 2.0, 4.0, 8.0, 16.0, 32.0]
 
 - type: image
   topic: /stereo/camera2/image_decompressed
@@ -43,7 +43,7 @@
     scale: 1.0
     debayer: false
     convert_12to8bits: false
-    brackets: [25, 100, 400, 1600, 6400, 25600]
+    brackets: [1.0, 2.0, 4.0, 8.0, 16.0, 32.0]
 
 - type: basic
   topic: /stereo/camera1/metadata
