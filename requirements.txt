@@ -1,8 +1,8 @@
 numpy
 opencv-python
 pandas
-pathlib
 rosbags
 tqdm
 pillow
 glymur
+PyYaml

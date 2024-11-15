@@ -1,0 +1,38 @@
+- type: odometry
+  topic: /mapping/icp_odom
+  folder: icp_odom
+  extension: csv
+
+- type: odometry
+  topic: /warthog_velocity_controller/odom
+  folder: wheel_odom
+  extension: csv
+
+- type: odometry
+  topic: /reachrs/tessellate/odom
+  folder: rtk_odom
+  extension: csv
+
+- type: imu
+  topic: /mti30/data
+  folder: imu
+  extension: csv
+
+- type: image
+  topic: /zed_node/left_raw/image_raw_color
+  folder: ground/images
+  extension: png
+  args:
+    rectify: false
+    scaling_factor: 1.0
+    gray_scale: false
+
+- type: basic
+  topic: /battery_logs
+  folder: power
+  extension: csv
+
+- type: audio
+  topic: /audio/audio
+  folder: audio
+  extension: wav
