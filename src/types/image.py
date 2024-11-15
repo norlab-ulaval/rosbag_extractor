@@ -35,7 +35,7 @@ def extract_images_from_rosbag(bag_file, topic_name, output_folder, args, image_
         raise ValueError("Quality factor can not be used with PNG images.")
 
     with AnyReader([Path(bag_file)]) as reader:
-        if args["rectify"]:
+        if "rectify" in args and args["rectify"]:
             K, D = get_camera_calibration_matrix(reader, topic_name)
 
         # iterate over messages
@@ -54,11 +54,11 @@ def extract_images_from_rosbag(bag_file, topic_name, output_folder, args, image_
                 np_image = cv2.cvtColor(np_image, cv2.COLOR_RGB2BGR)
             if "rectify" in args and args["rectify"]:
                 np_image = cv2.undistort(np_image, K, D)
-            if "scale" in args and args["scale"] != 1:
+            if "scale" in args and args["scale"] != 1.0:
                 np_image = cv2.resize(np_image, (0, 0), fx=args["scale"], fy=args["scale"])
 
             # Save image
-            if "quality_factor" in args and args["quality_factor"] < 1:
+            if "quality_factor" in args and args["quality_factor"] < 1.0:
                 jp2 = Jp2k(
                     os.path.join(output_folder, f"{int(timestamp):d}.{image_ext}"),
                     data=np_image,
