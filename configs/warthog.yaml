@@ -20,10 +20,15 @@
 
 - type: rectified_image
   topic: /zed_node/left_raw/image_raw_color
-  folder: ground_images
+  folder: ground/images
   extension: png
 
 - type: basic
   topic: /battery_logs
   folder: power
   extension: csv
+
+- type: audio
+  topic: /audio/audio
+  folder: audio
+  extension: wav
