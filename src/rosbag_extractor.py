@@ -17,7 +17,7 @@ from src.types.point_cloud import extract_point_clouds_from_rosbag
 #   folder: wheel_odom
 #   extension: csv
 
-# - type: rectified_image
+# - type: image
 #   topic: /zed_node/left_raw/image_raw_color
 #   folder: camera_left
 #   extension: png
@@ -85,6 +85,9 @@ class RosbagExtractor:
 
             elif data["type"] == "image":
                 extract_images_from_rosbag(self.bag_file, data["topic"], data_folder, data["args"], data["extension"])
+
+            else:
+                raise Exception(f"{bcolors.FAIL}Unsupported data type: {data['type']}!{bcolors.ENDC}")
 
             print(f"{bcolors.OKGREEN}Done! Exported to {data_folder}.{bcolors.ENDC}")
 
