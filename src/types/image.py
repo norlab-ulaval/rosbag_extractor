@@ -3,6 +3,7 @@ from pathlib import Path
 
 import cv2
 import numpy as np
+import pypylon.pylon as pylon
 from glymur import Jp2k
 from rosbags.highlevel import AnyReader
 from tqdm import tqdm
@@ -44,14 +45,16 @@ def extract_images_from_rosbag(bag_file, topic_name, output_folder, args, image_
         for connection, _, rawdata in tqdm(reader.messages(connections=connections)):
             msg = reader.deserialize(rawdata, connection.msgtype)
             timestamp = msg.header.stamp.sec * 1e9 + msg.header.stamp.nanosec
-            np_image = image_to_numpy(msg)
+
+            if "basler_decompress" in args and args["basler_decompress"]:
+                np_image = decompress_image(msg)
+            else:
+                np_image = image_to_numpy(msg)
 
             if "convert_12to8bits" in args and args["convert_12to8bits"]:
                 np_image = (np_image / 16).astype(np.uint8)
             if "debayer" in args and args["debayer"]:
                 np_image = cv2.cvtColor(np_image, cv2.COLOR_BayerRG2RGB)
-            if "rgb" in msg.encoding:
-                np_image = cv2.cvtColor(np_image, cv2.COLOR_RGB2BGR)
             if "rectify" in args and args["rectify"]:
                 np_image = cv2.undistort(np_image, K, D)
             if "scale" in args and args["scale"] != 1.0:
@@ -94,7 +97,7 @@ def get_camera_calibration_matrix(reader, topic_name):
 
 
 def image_to_numpy(msg):
-    # Taken from https://github.com/eric-wieser/ros_numpy/blob/master/src/ros_numpy/image.py
+    # Taken from https://github.com/eric-wieser/ros_numpy
 
     if not msg.encoding in ENCODINGS:
         raise TypeError("Unrecognized encoding {}".format(msg.encoding))
@@ -107,6 +110,8 @@ def image_to_numpy(msg):
     data = np.frombuffer(msg.data, dtype=dtype).reshape(shape)
     data.strides = (msg.step, dtype.itemsize * channels, dtype.itemsize)
 
+    if "rgb" in msg.encoding:
+        data = cv2.cvtColor(data, cv2.COLOR_RGB2BGR)
     if channels == 1:
         data = data[..., 0]
     return data
@@ -135,3 +140,16 @@ def sort_bracket_images(bag_file, image_topic, images_folder, image_ext, args):
                 os.rename(image_path, os.path.join(images_folder, f"{bracketing_value:.1f}", image_name))
 
     print(f"Done ! Sorted images to {images_folder}")
+
+
+def decompress_image(img_msg):
+    # Decompressing the image
+    decompressor = pylon.ImageDecompressor()
+    decompressor.SetCompressionDescriptor(bytes(img_msg.descriptor))
+    try:
+        image = decompressor.DecompressImage(bytes(img_msg.imgBuffer))
+    except Exception as e:
+        print(f"Lost an image due to compression issue.")
+        return None
+
+    return image.Array

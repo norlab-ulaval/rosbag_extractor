@@ -1,3 +1,27 @@
+- type: image
+  topic: /stereo/camera1/image_compressed
+  folder: camera_left
+  extension: png
+  args:
+    rectify: false
+    scale: 1.0
+    debayer: true
+    convert_12to8bits: true
+    brackets: [25, 100, 400, 1600, 6400, 25600]
+    basler_decompress: true
+
+- type: image
+  topic: /stereo/camera2/image_compressed
+  folder: camera_right
+  extension: png
+  args:
+    rectify: false
+    scale: 1.0
+    debayer: true
+    convert_12to8bits: true
+    brackets: [25, 100, 400, 1600, 6400, 25600]
+    basler_decompress: true
+
 - type: imu
   topic: /MTI_imu/data
   folder: imu
@@ -22,28 +46,6 @@
   topic: /stm32_parameters
   folder: stm32_parameters
   extension: csv
-
-- type: image
-  topic: /stereo/camera1/image_decompressed
-  folder: camera_left
-  extension: png
-  args:
-    rectify: false
-    scale: 1.0
-    debayer: false
-    convert_12to8bits: false
-    brackets: [1.0, 2.0, 4.0, 8.0, 16.0, 32.0]
-
-- type: image
-  topic: /stereo/camera2/image_decompressed
-  folder: camera_right
-  extension: png
-  args:
-    rectify: false
-    scale: 1.0
-    debayer: false
-    convert_12to8bits: false
-    brackets: [1.0, 2.0, 4.0, 8.0, 16.0, 32.0]
 
 - type: basic
   topic: /stereo/camera1/metadata
