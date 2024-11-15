@@ -40,7 +40,7 @@
             "gray_scale": false,
             "remove_bayer_pattern": false,
             "convert_12bits_to_8bits": false,
-            "brackets": [1.0, 2.0, 4.0, 8.0, 16.0, 32.0]
+            "brackets": [25, 100, 400, 1600, 6400, 25600]
         }
     },
     {
@@ -60,7 +60,7 @@
             "gray_scale": false,
             "remove_bayer_pattern": false,
             "convert_12bits_to_8bits": false,
-            "brackets": [1.0, 2.0, 4.0, 8.0, 16.0, 32.0]
+            "brackets": [25, 100, 400, 1600, 6400, 25600]
         }
     },
     {
@@ -71,8 +71,14 @@
     },
     {
         "type": "basic",
-        "topic": "/stereo/static_parameters",
-        "folder": "camera_static_parameters",
+        "topic": "/stereo/camera1/static_parameters",
+        "folder": "camera_left_static_parameters",
+        "extension": "csv"
+    },
+    {
+        "type": "basic",
+        "topic": "/stereo/camera2/static_parameters",
+        "folder": "camera_right_static_parameters",
         "extension": "csv"
     }
 ]
