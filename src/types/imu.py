@@ -53,6 +53,8 @@ def extract_imu_from_rosbag(bag_file, topic_name, output_file):
         )
         imu_df.to_csv(output_file, index=False)
 
+    print(f"Done ! Exported imu data to {output_file}")
+
 
 def euler_from_quaternion(x, y, z, w):
 

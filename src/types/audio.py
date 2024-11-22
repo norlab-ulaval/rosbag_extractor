@@ -1,6 +1,7 @@
+import wave
 from pathlib import Path
 
-import pandas as pd
+import numpy as np
 from rosbags.highlevel import AnyReader
 from rosbags.typesys import get_types_from_msg, register_types
 from tqdm import tqdm
@@ -21,15 +22,31 @@ register_types(get_types_from_msg(AUDIO_DATA_STAMPED_MSG, "audio_common_msgs/msg
 
 
 def extract_audio_from_rosbag(bag_file, topic_name, output_file):
-    with AnyReader([Path(bag_file)]) as reader, open(output_file, "wb") as mp3_file:
+
+    with AnyReader([Path(bag_file)]) as reader:
         # iterate over messages
+        audio_data = bytearray()
         print(f"Extracting audio data from topic \"{topic_name}\" to file \"{output_file.split('/')[-1]}\"")
         connections = [x for x in reader.connections if x.topic == topic_name]
         for connection, _, rawdata in tqdm(reader.messages(connections=connections)):
             msg = reader.deserialize(rawdata, connection.msgtype)
             if connection.msgtype == "audio_common_msgs/msg/AudioData":
-                mp3_file.write(b"".join(msg.data))
+                audio_data.extend(msg.data)
             elif connection.msgtype == "audio_common_msgs/msg/AudioDataStamped":
-                mp3_file.write(b"".join(msg.audio.data))
+                audio_data.extend(msg.audio.data)
             else:
                 print(f"Unknown audio message type: {connection.msgtype}")
+
+    if output_file.endswith(".wav"):
+        with wave.open(output_file, "wb") as wav_file:
+            wav_file.setnchannels(1)
+            wav_file.setsampwidth(2)
+            wav_file.setframerate(44100)
+            wav_file.writeframes(np.frombuffer(audio_data, dtype=np.int16).tobytes())
+
+    elif output_file.endswith(".mp3"):
+        with open(output_file, "wb") as mp3_file:
+            mp3_file.write(audio_data)
+
+    else:
+        print(f"Unsupported output file format: {output_file}")

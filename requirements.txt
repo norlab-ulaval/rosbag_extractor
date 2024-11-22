@@ -3,4 +3,7 @@ opencv-python
 pandas
 rosbags
 tqdm
+pillow
+glymur
 PyYaml
+pypylon

@@ -8,12 +8,36 @@
   folder: wheel_odom
   extension: csv
 
-- type: rectified_image
-  topic: /zed_node/left_raw/image_raw_color
-  folder: camera_left
-  extension: png
+- type: odometry
+  topic: /reachrs/tessellate/odom
+  folder: rtk_odom
+  extension: csv
 
 - type: imu
   topic: /mti30/data
   folder: imu
   extension: csv
+
+- type: image
+  topic: /zed_node/left_raw/image_raw_color
+  folder: ground/images
+  extension: png
+  args:
+    rectify: false
+    scaling_factor: 1.0
+    gray_scale: false
+
+- type: basic
+  topic: /battery_logs
+  folder: power
+  extension: csv
+
+- type: audio
+  topic: /audio/left_mic
+  folder: audio_left
+  extension: wav
+
+- type: audio
+  topic: /audio/right_mic
+  folder: audio_right
+  extension: wav
