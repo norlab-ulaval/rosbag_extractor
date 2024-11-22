@@ -33,6 +33,11 @@
   extension: csv
 
 - type: audio
-  topic: /audio/audio
-  folder: audio
+  topic: /audio/left_mic
+  folder: audio_left
+  extension: wav
+
+- type: audio
+  topic: /audio/right_mic
+  folder: audio_right
   extension: wav

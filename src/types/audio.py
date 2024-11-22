@@ -41,7 +41,7 @@ def extract_audio_from_rosbag(bag_file, topic_name, output_file):
         with wave.open(output_file, "wb") as wav_file:
             wav_file.setnchannels(1)
             wav_file.setsampwidth(2)
-            wav_file.setframerate(16000)
+            wav_file.setframerate(44100)
             wav_file.writeframes(np.frombuffer(audio_data, dtype=np.int16).tobytes())
 
     elif output_file.endswith(".mp3"):
