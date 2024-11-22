@@ -5,9 +5,9 @@
   args:
     rectify: false
     scale: 1.0
-    debayer: true
-    convert_12to8bits: true
-    brackets: [25, 100, 400, 1600, 6400, 25600]
+    debayer: false
+    convert_12to8bits: false
+    brackets: [1.0, 2.0, 4.0, 8.0, 16.0, 32.0]
     basler_decompress: true
 
 - type: image
@@ -17,30 +17,10 @@
   args:
     rectify: false
     scale: 1.0
-    debayer: true
-    convert_12to8bits: true
-    brackets: [25, 100, 400, 1600, 6400, 25600]
+    debayer: false
+    convert_12to8bits: false
+    brackets: [1.0, 2.0, 4.0, 8.0, 16.0, 32.0]
     basler_decompress: true
-
-- type: imu
-  topic: /MTI_imu/data
-  folder: imu
-  extension: csv
-
-- type: gnss
-  topic: /gps_data_raw
-  folder: gnss
-  extension: csv
-
-- type: basic
-  topic: /nmea_sentence
-  folder: gnss_nmea_raw
-  extension: csv
-
-- type: point_cloud
-  topic: /velodyne_points
-  folder: lidar
-  extension: csv
 
 - type: basic
   topic: /stm32_parameters
@@ -66,3 +46,24 @@
   topic: /stereo/camera2/static_parameters
   folder: camera_right_static_parameters
   extension: csv
+  
+- type: imu
+  topic: /MTI_imu/data
+  folder: imu
+  extension: csv
+
+- type: gnss
+  topic: /gps_data_raw
+  folder: gnss
+  extension: csv
+
+- type: basic
+  topic: /nmea_sentence
+  folder: gnss_nmea_raw
+  extension: csv
+
+- type: point_cloud
+  topic: /velodyne_points
+  folder: lidar
+  extension: csv
+
