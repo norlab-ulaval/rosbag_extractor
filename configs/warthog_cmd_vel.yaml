@@ -1,0 +1,4 @@
+- type: twist
+  topic: /doughnut_cmd_vel
+  folder: doughnut_cmd_vel
+  extension: csv

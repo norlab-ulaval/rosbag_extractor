@@ -1,0 +1,20 @@
+[
+    {
+        "type": "basic",
+        "topic": "/dps310_2/data",
+        "folder": "dps310_2_data",
+        "extension": "csv"
+    },
+    {
+        "type": "basic",
+        "topic": "/setra/pressure",
+        "folder": "setra",
+        "extension": "csv"
+    },
+    {
+        "type": "basic",
+        "topic": "/mcp9808/temperature",
+        "folder": "mcp9808",
+        "extension": "csv"
+    }
+]

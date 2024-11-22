@@ -9,6 +9,7 @@ from message_types.image import extract_images_from_rosbag, sort_bracket_images
 from message_types.imu import extract_imu_from_rosbag
 from message_types.odom import extract_odom_from_rosbag
 from message_types.point_cloud import extract_point_clouds_from_rosbag
+from message_types.cmd_vel import extract_cmd_vel_from_rosbag
 from rosbags.highlevel import AnyReader
 
 ########## EXAMPLE OF CONFIG FILE ##########
@@ -80,6 +81,9 @@ class RosbagExtractor:
 
             elif data["type"] == "odometry":
                 extract_odom_from_rosbag(self.bag_file, data["topic"], output_file)
+                
+            elif data["type"] == "twist":
+                extract_cmd_vel_from_rosbag(self.bag_file,data["topic"],output_file)
 
             elif data["type"] == "point_cloud":
                 extract_point_clouds_from_rosbag(self.bag_file, data["topic"], data_folder)
@@ -94,6 +98,7 @@ class RosbagExtractor:
                 extract_images_from_rosbag(self.bag_file, data["topic"], data_folder, data["extension"])
                 sort_bracket_images(self.bag_file, data["topic"], data_folder, data["extension"], data["args"])
 
+            
             print(f"{bcolors.OKGREEN}Done! Exported to {data_folder}.{bcolors.ENDC}")
 
     def _check_requested_topics(self, ignore_missing=False):

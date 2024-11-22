@@ -9,9 +9,9 @@ from rosbag_extractor import RosbagExtractor
 
 ################## PARAMETERS ##################
 
-INPUT_BAG = "/media/jean-michel/SSD_JM/Data/UL_20240806/merged_2024_08_06-11_15_56"
-OUTPUT_FOLDER = "/home/jean-michel/repos/self_supervised_traversability/data/warthog6"
-CONFIG = "warthog"  # Config file name without extension, should exist in the configs folder
+INPUT_BAG = "/media/nicolassamson/Expansion/arcxhive/drive_FR/drive_FR/jm_ice/high-level/exp1/rosbag2_2024_07_30-16_28_53"
+OUTPUT_FOLDER = "/media/nicolassamson/Expansion/arcxhive/drive_FR/drive_FR/jm_ice/high-level/dougnut_cmd_vel"
+CONFIG = "warthog_cmd_vel"  # Config file name without extension, should exist in the configs folder
 
 ################################################
 
