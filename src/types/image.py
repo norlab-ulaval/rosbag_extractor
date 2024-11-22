@@ -150,6 +150,6 @@ def decompress_image(img_msg):
         image = decompressor.DecompressImage(bytes(img_msg.imgBuffer))
     except Exception as e:
         print(f"Lost an image due to compression issue.")
-        return None
+        return np.zeros((1200, 1920, 1), dtype=np.uint16)
 
     return image.Array
