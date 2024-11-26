@@ -2,10 +2,18 @@
 
 A python utility to convert rosbags into human-readable data.
 
+# Installation
+
+It is suggested to install the module with pip: 
+
+```bash
+pip install -e .
+```
+
 # Usage
 
 ```bash
-usage: main.py [-h] [-i INPUT] [-c CONFIG] [-o OUTPUT] [--ignore-missing] [--overwrite]
+usage: rosbag_extractor [-h] [-i INPUT] [-c CONFIG] [-o OUTPUT] [--ignore-missing] [--overwrite]
 
 Extract data from a rosbag file to a directory.
 
