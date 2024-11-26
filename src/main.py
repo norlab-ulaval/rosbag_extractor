@@ -9,7 +9,7 @@ from src.rosbag_extractor import RosbagExtractor
 def load_config(name) -> dict:
     if not name.endswith(".yaml"):
         name += ".yaml"
-    config_path = os.path.join(os.path.dirname(__file__), "configs", f"{name}")
+    config_path = os.path.join(os.path.dirname(__file__), "..", "configs", f"{name}")
     return yaml.safe_load(open(config_path))
 
 
