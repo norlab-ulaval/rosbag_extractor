@@ -75,7 +75,7 @@ class RosbagExtractor:
                 extract_gnss_from_rosbag(self.bag_file, data["topic"], output_file)
 
             elif data["type"] == "audio":
-                extract_audio_from_rosbag(self.bag_file, data["topic"], output_file)
+                extract_audio_from_rosbag(self.bag_file, data["topic"], output_file, data["args"])
 
             elif data["type"] == "odometry":
                 extract_odom_from_rosbag(self.bag_file, data["topic"], output_file)

@@ -36,8 +36,12 @@
   topic: /audio/left_mic
   folder: audio_left
   extension: wav
+  args:
+    sample_rate: 44100
 
 - type: audio
   topic: /audio/right_mic
   folder: audio_right
   extension: wav
+  args:
+    sample_rate: 44100

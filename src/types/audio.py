@@ -21,7 +21,11 @@ register_types(get_types_from_msg(AUDIO_DATA_MSG, "audio_common_msgs/msg/AudioDa
 register_types(get_types_from_msg(AUDIO_DATA_STAMPED_MSG, "audio_common_msgs/msg/AudioDataStamped"))
 
 
-def extract_audio_from_rosbag(bag_file, topic_name, output_file):
+def extract_audio_from_rosbag(bag_file, topic_name, output_file, args):
+
+    sample_rate = 44100
+    if "sample_rate" in args and args["sample_rate"]:
+        sample_rate = int(args["sample_rate"])
 
     with AnyReader([Path(bag_file)]) as reader:
         # iterate over messages
@@ -41,7 +45,7 @@ def extract_audio_from_rosbag(bag_file, topic_name, output_file):
         with wave.open(output_file, "wb") as wav_file:
             wav_file.setnchannels(1)
             wav_file.setsampwidth(2)
-            wav_file.setframerate(44100)
+            wav_file.setframerate(sample_rate)
             wav_file.writeframes(np.frombuffer(audio_data, dtype=np.int16).tobytes())
 
     elif output_file.endswith(".mp3"):
