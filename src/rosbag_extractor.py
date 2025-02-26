@@ -9,6 +9,7 @@ from src.types.image import extract_images_from_rosbag, sort_bracket_images
 from src.types.imu import extract_imu_from_rosbag
 from src.types.odom import extract_odom_from_rosbag
 from src.types.point_cloud import extract_point_clouds_from_rosbag
+from src.types.tf import extract_tf_from_rosbags
 
 ########## EXAMPLE OF CONFIG FILE ##########
 
@@ -80,14 +81,14 @@ class RosbagExtractor:
             elif data["type"] == "odometry":
                 extract_odom_from_rosbag(self.bag_file, data["topic"], output_file)
                 
-            elif data["type"] == "twist":
-                extract_cmd_vel_from_rosbag(self.bag_file,data["topic"],output_file)
-
             elif data["type"] == "point_cloud":
                 extract_point_clouds_from_rosbag(self.bag_file, data["topic"], data_folder)
 
             elif data["type"] == "image":
                 extract_images_from_rosbag(self.bag_file, data["topic"], data_folder, data["args"], data["extension"])
+
+            elif data["type"] == "tf":
+                extract_tf_from_rosbags(self.bag_file, data["topic"], data_folder, data["args"])
 
             else:
                 raise Exception(f"{bcolors.FAIL}Unsupported data type: {data['type']}!{bcolors.ENDC}")

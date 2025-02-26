@@ -7,3 +7,5 @@ pillow
 glymur
 PyYaml
 pypylon
+treelib
+PyYaml

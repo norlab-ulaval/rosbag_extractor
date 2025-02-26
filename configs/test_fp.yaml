@@ -1,0 +1,14 @@
+- type: tf
+  topic: /tf
+  folder: tf
+  extension: csv
+  args:
+    linked_2_topic: []
+    last_tf_topic: False
+- type: tf
+  topic: /tf_static
+  folder: tf
+  extension: csv
+  args:
+    linked_2_topic: [/tf]
+    last_tf_topic: True
