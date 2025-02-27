@@ -154,7 +154,7 @@ class TfVisualizer():
         Args:
             save_results (bool, optional): Instead of an animation, create and save a video of the tf. Defaults to False.
             camera_view (bool, optional): Change the default view of the animation to fit the classic camera frame where z goes through the screen, x to the right and y downward . Defaults to False.
-            max_iter (int, optional): Only in save mod to verify and debug. Defaults to 0.
+            max_iter (int, optional): if == 0, save all the frames. Only in save mod to verify and debug. Defaults to 0.
             arrow_scale (int, optional): scale parameter for the size of the arrow. Defaults to 1.
             marker_size (int, optional): scale parameter for the size of the arrow.. Defaults to 1.
         """
@@ -169,7 +169,10 @@ class TfVisualizer():
 
         if save_results:
             # Create a progress bar
-            progress_bar = tqdm(total=len(self.timestamp_to_iterate), desc="Saving animation", unit="frame")
+            if max_iter!=0:
+                progress_bar = tqdm(total=max_iter, desc="Saving animation", unit="frame")
+            else:
+                progress_bar = tqdm(total=len(self.timestamp_to_iterate), desc="Saving animation", unit="frame")
             
             def update_and_progress(num):
                 self.update_animation(num)
@@ -218,4 +221,4 @@ if __name__ == "__main__":
     path_ = pathlib.Path("/media/nicolassamson/ssd_NS/wilah/extracted_results/tf/requested_tf/zedx_left_camera_optical_frame")
     visualizer = TfVisualizer()
     visualizer.load_data(path_)
-    visualizer.create_animation(save_results=False,camera_view=True,max_iter=100)['basemast', 'camera_zed_safety', 'basemast', 'trailer', 'basemast', 'mast', 'camera_zed1', 'basemast', 'mast', 'mainboom', 'stick', 'telescope', 'upperpassive', 'lowerpassive', 'basegrapple', 'gripperright', 'tong_right_tips', 'basemast', 'mast', 'mainboom', 'stick', 'telescope', 'upperpassive', 'lowerpassive', 'basegrapple', 'gripperleft', 'tong_left_tips', 'basemast', 'mast', 'mainboom', 'stick', 'camera_zed2', 'zedx_base_link', 'zedx_camera_center', 'zedx_right_camera_frame', 'zedx_right_camera_optical_frame', 'basemast', 'mast', 'mainboom', 'stick', 'camera_zed2', 'zedx_base_link', 'zedx_camera_center', 'zedx_left_camera_frame', 'zedx_imu_link', 'basemast', 'mast', 'mainboom', 'stick', 'camera_zed2', 'zedx_base_link', 'zedx_camera_center', 'zedx_left_camera_frame', 'zedx_left_camera_optical_frame']
+    visualizer.create_animation(save_results=True,camera_view=True,max_iter=10)
