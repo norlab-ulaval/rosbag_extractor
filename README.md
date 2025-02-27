@@ -70,3 +70,67 @@ Images extraction include extra parameters to achieve the desired output:
 | convert_12to8bits | bool      | Whether to convert 12 bits images to 8 bits before saving                               |
 | brackets          | list[int] | Sort extracted images in specified brackets folder (will look for <cam_topic>/metadata) |
 | basler_decompress | bool      | (Basler only) Decompress images, message type should be packets                         |
+
+
+# TF 
+
+To extract the tf:
+
+1. Add the tf into your config file like it is down in the test_fp.yaml
+
+2. Reinstall rosbagextractor
+
+3. Run the rosbag extractor
+
+
+
+
+### Request TF
+
+Two classes have been develop to request tf that are not saved by default in the rosbags. Currently this two classes respect the folowing assumption : 
+
+1. The desired rate to compute the tf is the tf with the highest publication rate. 
+2. The tf are not interpolated. The last published tf is repeated to fit the fastest tf publicaiton rate.
+3. Tf are considered static when they are published less than 5 times. Therefore, tf with less than 5 pulication will only load the first tf. (TODO in the next version)
+4. Only .csv are supported
+5. dynamic joints are not supported (to validate)
+
+#### Example (request)
+
+
+1. Go in ./src/tf_utils/compute_tf.py
+2. Write the path to your tf folder created by rosbag extractor
+3. Create a Tfquery object using that path
+4. Use the method query.request_tf_a_in_frame_B(<tf to extract>,< Frame of reference>,debug=False)
+5. Use the save_tf() method to save the requested tf. 
+
+The requested tf are saved in .../tf/requested_tf/< frame of reference >/<tf to extract>_in_< frame of reference>.csv
+
+Multiple tf can be requested before a save because save export all the requested tf that are log at each calculation. 
+
+'''
+
+    path_ = "<path to your folder>/tf"
+    query = Tfquery(path_)  
+    query.request_tf_a_in_frame_B("tong_left_tips","zedx_left_camera_optical_frame",debug=False)
+    query.save_tf()
+'''
+#### Example (visualization of the tf)
+To vizualize the tf :
+
+1. Go in ./src/tf_utils/animation_validation.py
+2. Write the path to your tf/requested_tf/< Frame of reference>
+3. Create a TfVisualizer 
+4. Load the data using that path
+4. Use the method query.create_animation to create the animation
+
+The folowing code will create the animation for all the tf computed in the < Frame of reference>. 
+
+'''
+
+    path_ = tf/requested_tf/< Frame of reference>
+    visualizer = TfVisualizer()
+    visualizer.load_data(path_)
+    visualizer.create_animation(save_results=True,camera_view=True,max_iter=0)
+
+'''

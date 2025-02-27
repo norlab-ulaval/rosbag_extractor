@@ -54,7 +54,15 @@ def reindex_dataframe(df, new_index,col_to_use_as_index='time'):
 class Tfquery():
 
     def __init__(self, path_to_results_folder,tf_tree_file = "combined_tf_tree.yaml",debug=False):
+        """Create a Tfquery object that will allow to compute the tf between two frames. 
+        The creation of the object will load all the tf data, compute the stats about the tf,
+        and save the tf tree in ../../tf_analysis/tf_tree.txt.
 
+        Args:
+            path_to_results_folder (_type_): path to th tf/tf_requested/<frame_of_reference folder>
+            tf_tree_file (str, optional): yaml file that contains child:parent information for tree construction. Defaults to "combined_tf_tree.yaml".
+            debug (bool, optional): _description_. Defaults to False.
+        """
         if isinstance(path_to_results_folder,str):
             path_to_results_folder = pathlib.Path(path_to_results_folder)
         self.path_to_results_folder = path_to_results_folder
@@ -567,7 +575,14 @@ class Tfquery():
         self.dico_tf_computed[self.name_tfb_in_tfa] = pd.DataFrame.from_records(list_tf_b_in_a)
         
     
-    def save_tf(self,add_on="",adjust_index_to_time_ref=True):
+    def save_tf(self,adjust_index_to_time_ref=True):
+        """Save all tf previusly requested in the tf/tf_requested folder. 
+        Each frame of reference will have its own folder in which the corresponding tf will be saved.
+        each csv will be named <frame of reference>_in_<frame of reference>.csv
+        
+        Args:
+            adjust_index_to_time_ref (bool, optional): _description_. Defaults to True.
+        """
         
 
         for tf_name, df_tf in self.dico_tf_computed.items():
@@ -579,15 +594,9 @@ class Tfquery():
                 folder_for_frame.mkdir()
             path_to_save = folder_for_frame/(tf_name+".csv")
             
-            if add_on != "":
-                path_to_folder = path_to_save = self.path_to_requested_tf/add_on
-                
-                if not path_to_folder.exists():
-                    path_to_folder.mkdir()
-                path_to_save = path_to_folder/(tf_name+".csv")
 
             if adjust_index_to_time_ref:
-                print(tf_name)
+                #print(tf_name)
                 df_tf = reindex_dataframe(df_tf, self.timestamp_ref,col_to_use_as_index='timestamp')
             df_tf.to_csv(path_to_save)
         
@@ -595,8 +604,16 @@ class Tfquery():
     def __str__(self):
         return str(self.tf_tree)
     
-    def request_tf_a_in_frame_B(self,tfa,tfb,using_ros_time = False,
-                                linear_interpolation = False,debug = True):
+    def request_tf_a_in_frame_B(self,tfa,tfb,debug = True):
+        """Compute the tf of the frame a in the frame b 
+
+        Args:
+            tfa (_type_): the name of the  frame a in the tf tree look in the folder tf utils to get the name
+            tfb (_type_): the name of the  frame b in the tf tree look in the folder tf utils to get the name
+            debug (bool, optional): _description_. Defaults to True.
+        """
+        using_ros_time = False
+        linear_interpolation = False
         self.get_path_from_tf_a_to_b(tfa,tfb,debug=debug)
         
         if self.verify_if_tf_are_all_static():
@@ -610,6 +627,8 @@ class Tfquery():
 
         
     def computed_tf_in_root_frame(self):
+        """Compute all tf from the root frame
+        """
         
         list_paths =  extract_paths(self.tf_tree)
 
@@ -634,8 +653,7 @@ if __name__ == "__main__":
     
     query = Tfquery(path_)
     #query.computed_tf_in_root_frame()
-
-    query.computed_tf_in_root_frame()
+    #query.computed_tf_in_root_frame()
     #query.get_path_from_tf_a_to_b()
     #query.request_tf_a_in_frame_B("basemast","zedx_left_camera_optical_frame",debug=False)
     query.request_tf_a_in_frame_B("tong_left_tips","zedx_left_camera_optical_frame",debug=False)

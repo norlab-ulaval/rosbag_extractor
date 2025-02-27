@@ -75,7 +75,8 @@ class TfVisualizer():
         for path in path_to_folder.iterdir():
             
             self.tfa_name =  path.stem.split("_in_")[0]
-                
+            if path.suffix not in [".csv"]:
+                continue
             data = {}
             data["data"] = pd.read_csv(path,index_col="timestamp")
             data["frame_name"] =  self.tfa_name 
@@ -146,7 +147,17 @@ class TfVisualizer():
         self.update_one_frame(data,self.reference_frame)
         self.ax.set_title(f"Frame at timestamp {timestamp*10e-9}")
     def create_animation(self, save_results=False, arrow_scale=1,marker_size=1,camera_view=False,max_iter=0):
-        
+        """Create the animation of the tf frames in the 3D space.
+
+        To have an interactive animation, set save_results to False.
+
+        Args:
+            save_results (bool, optional): Instead of an animation, create and save a video of the tf. Defaults to False.
+            camera_view (bool, optional): Change the default view of the animation to fit the classic camera frame where z goes through the screen, x to the right and y downward . Defaults to False.
+            max_iter (int, optional): Only in save mod to verify and debug. Defaults to 0.
+            arrow_scale (int, optional): scale parameter for the size of the arrow. Defaults to 1.
+            marker_size (int, optional): scale parameter for the size of the arrow.. Defaults to 1.
+        """
         self.set_x_y_z_lim(scale=1.1)
         self.pause =False
         self.arrow_scale = arrow_scale
@@ -204,13 +215,7 @@ class TfVisualizer():
 
 if __name__ == "__main__":
     path_ = pathlib.Path("/media/nicolassamson/ssd_NS/wilah/extracted_results/tf")
-    
-    
-    #query.get_path_from_tf_a_to_b()
-    #query.request_tf_a_in_frame_B("tong_right_tips","zedx_right_camera_optical_frame")
     path_ = pathlib.Path("/media/nicolassamson/ssd_NS/wilah/extracted_results/tf/requested_tf/zedx_left_camera_optical_frame")
-    #path_ = pathlib.Path("/media/nicolassamson/ssd_NS/wilah/extracted_results/tf/requested_tf/basemast")
-    
     visualizer = TfVisualizer()
     visualizer.load_data(path_)
-    visualizer.create_animation(save_results=True,camera_view=True,max_iter=0)
+    visualizer.create_animation(save_results=False,camera_view=True,max_iter=100)['basemast', 'camera_zed_safety', 'basemast', 'trailer', 'basemast', 'mast', 'camera_zed1', 'basemast', 'mast', 'mainboom', 'stick', 'telescope', 'upperpassive', 'lowerpassive', 'basegrapple', 'gripperright', 'tong_right_tips', 'basemast', 'mast', 'mainboom', 'stick', 'telescope', 'upperpassive', 'lowerpassive', 'basegrapple', 'gripperleft', 'tong_left_tips', 'basemast', 'mast', 'mainboom', 'stick', 'camera_zed2', 'zedx_base_link', 'zedx_camera_center', 'zedx_right_camera_frame', 'zedx_right_camera_optical_frame', 'basemast', 'mast', 'mainboom', 'stick', 'camera_zed2', 'zedx_base_link', 'zedx_camera_center', 'zedx_left_camera_frame', 'zedx_imu_link', 'basemast', 'mast', 'mainboom', 'stick', 'camera_zed2', 'zedx_base_link', 'zedx_camera_center', 'zedx_left_camera_frame', 'zedx_left_camera_optical_frame']
