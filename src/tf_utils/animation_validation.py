@@ -217,8 +217,8 @@ class TfVisualizer():
 
 
 if __name__ == "__main__":
-    path_ = pathlib.Path("/media/nicolassamson/ssd_NS/wilah/extracted_results/tf")
-    path_ = pathlib.Path("/media/nicolassamson/ssd_NS/wilah/extracted_results/tf/requested_tf/zedx_left_camera_optical_frame")
+    path_ = pathlib.Path("/media/nicolassamson/ssd_NS/wilah/extracted_results/tf/requested_tf/basemast")
+    #path_ = pathlib.Path("/media/nicolassamson/ssd_NS/wilah/extracted_results/tf/requested_tf/zedx_left_camera_optical_frame")
     visualizer = TfVisualizer()
     visualizer.load_data(path_)
-    visualizer.create_animation(save_results=True,camera_view=True,max_iter=10)
+    visualizer.create_animation(save_results=False,camera_view=False,max_iter=10)

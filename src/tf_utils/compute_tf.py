@@ -644,8 +644,8 @@ class Tfquery():
             tfb = path[0]
             tfa = path[-1]
             print("Computing tf from ", tfa, " in ", tfb)
-            self.request_tf_a_in_frame_B(tfa, tfb, using_ros_time=False,
-                         linear_interpolation=False, debug=False)
+            self.request_tf_a_in_frame_B(tfa, tfb, 
+                        debug=False)
         self.save_tf()
 
 if __name__ == "__main__":
@@ -653,7 +653,7 @@ if __name__ == "__main__":
     
     query = Tfquery(path_)
     #query.computed_tf_in_root_frame()
-    #query.computed_tf_in_root_frame()
+    query.computed_tf_in_root_frame()
     #query.get_path_from_tf_a_to_b()
     #query.request_tf_a_in_frame_B("basemast","zedx_left_camera_optical_frame",debug=False)
     query.request_tf_a_in_frame_B("tong_left_tips","zedx_left_camera_optical_frame",debug=False)
