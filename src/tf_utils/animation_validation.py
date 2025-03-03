@@ -146,6 +146,7 @@ class TfVisualizer():
         
         self.update_one_frame(data,self.reference_frame)
         self.ax.set_title(f"Frame at timestamp {timestamp*10e-9}")
+
     def create_animation(self, save_results=False, arrow_scale=1,marker_size=1,camera_view=False,max_iter=0):
         """Create the animation of the tf frames in the 3D space.
 
@@ -217,8 +218,12 @@ class TfVisualizer():
 
 
 if __name__ == "__main__":
-    path_ = pathlib.Path("/media/nicolassamson/ssd_NS/wilah/extracted_results/tf/requested_tf/basemast")
-    #path_ = pathlib.Path("/media/nicolassamson/ssd_NS/wilah/extracted_results/tf/requested_tf/zedx_left_camera_optical_frame")
+    #path_ = pathlib.Path("/media/nicolassamson/ssd_NS/wilah/extracted_results/tf/requested_tf/basemast")
+    path_ = pathlib.Path("/media/nicolassamson/ssd_NS/wilah/extracted_results/tf/requested_tf/zedx_left_camera_optical_frame")
+    #path_ = pathlib.Path("/media/nicolassamson/ssd_NS/wilah/extracted_results/tf/requested_tf/zedx_left_camera_frame")
+    # -374.12033
+    # -0.137
+    # -529.05027
     visualizer = TfVisualizer()
     visualizer.load_data(path_)
-    visualizer.create_animation(save_results=False,camera_view=False,max_iter=10)
+    visualizer.create_animation(save_results=False,camera_view=True,max_iter=0)

@@ -180,8 +180,6 @@ class Tfquery():
 
         self.path_from_a_to_b = path_from_a_to_b
         
-        self.name_tfa_in_tfb = tfa+"_in_"+tfb
-        self.name_tfb_in_tfa = tfb+"_in_"+tfa
         
         if self.path_from_a_to_b == []:
             raise ValueError("The path from a to b is empty")
@@ -462,11 +460,11 @@ class Tfquery():
         
         record = self.transform_from_matrix_to_record(tf_final_a_in_b)
         record["timestamp"] = minimum_time
-        self.dico_tf_computed[self.name_tfb_in_tfa] = pd.DataFrame.from_records([record])
+        self.dico_tf_computed[self.name_tfa_in_tfb] = pd.DataFrame.from_records([record])
         
-        record_reverse = self.transform_from_matrix_to_record(np.linalg.inv(tf_final_b_in_a))
+        record_reverse = self.transform_from_matrix_to_record(tf_final_b_in_a)
         record_reverse["timestamp"] = minimum_time
-        self.dico_tf_computed[self.name_tfa_in_tfb] = pd.DataFrame.from_records([record_reverse])
+        self.dico_tf_computed[self.name_tfb_in_tfa] = pd.DataFrame.from_records([record_reverse])
         
     def compute_tf(self,using_ros_time = False,linear_interpolation = False,debug = False,info=False):
         """Assuming 
@@ -568,7 +566,7 @@ class Tfquery():
             time = next_time
         #print(list_tf_a_in_b)
         
-        self.dico_tf_computed[self.name_tfa_in_tfb] = pd.DataFrame.from_records(list_tf_a_in_b)
+        self.dico_tf_computed[self.name_tfa_in_tfb] = pd.DataFrame.from_records(list_tf_a_in_b)#)
         #print("\n"*3,len(list_tf_a_in_b),"\n"*3)
         # Computed reverse tf 
 
@@ -616,7 +614,11 @@ class Tfquery():
         linear_interpolation = False
         self.get_path_from_tf_a_to_b(tfa,tfb,debug=debug)
         
+        self.name_tfa_in_tfb = tfa+"_in_"+tfb
+        self.name_tfb_in_tfa = tfb+"_in_"+tfa
+        
         if self.verify_if_tf_are_all_static():
+            
             self.compute_tf_static()
         else:
             self.compute_tf(using_ros_time = using_ros_time,

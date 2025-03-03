@@ -106,6 +106,8 @@ Two classes have been develop to request tf that are not saved by default in the
 
 The requested tf are saved in .../tf/requested_tf/< frame of reference >/<tf to extract>_in_< frame of reference>.csv
 
+
+###### THERE IS A BUG WITH REQUEST THE ROOT, do not use it with root. 
 Multiple tf can be requested before a save because save export all the requested tf that are log at each calculation. 
 
 '''
