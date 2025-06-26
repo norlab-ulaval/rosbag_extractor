@@ -59,6 +59,8 @@ def extract_images_from_rosbag(bag_file, topic_name, output_folder, args, image_
                 np_image = cv2.undistort(np_image, K, D)
             if "scale" in args and args["scale"] != 1.0:
                 np_image = cv2.resize(np_image, (0, 0), fx=args["scale"], fy=args["scale"])
+            if "gray_scale" in args and args["gray_scale"]:
+                np_image = cv2.cvtColor(np_image, cv2.COLOR_BGR2GRAY)
 
             # Save image
             if "quality_factor" in args and args["quality_factor"] < 1.0:
