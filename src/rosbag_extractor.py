@@ -10,22 +10,6 @@ from src.types.imu import extract_imu_from_rosbag
 from src.types.odom import extract_odom_from_rosbag
 from src.types.point_cloud import extract_point_clouds_from_rosbag
 
-########## EXAMPLE OF CONFIG FILE ##########
-
-# - type: odometry
-#   topic: /warthog_velocity_controller/odom
-#   folder: wheel_odom
-#   extension: csv
-
-# - type: image
-#   topic: /zed_node/left_raw/image_raw_color
-#   folder: camera_left
-#   extension: png
-
-# See full examples in ./configs folder
-
-############################################
-
 
 class bcolors:
     HEADER = "\033[95m"
