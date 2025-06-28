@@ -2,6 +2,7 @@ numpy
 opencv-python
 pandas
 rosbags
+scipy
 tqdm
 pillow
 glymur
