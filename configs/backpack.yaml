@@ -25,45 +25,38 @@
 - type: basic
   topic: /stm32_parameters
   folder: stm32_parameters
-  extension: csv
 
 - type: basic
   topic: /stereo/camera1/metadata
   folder: camera_left_metadata
-  extension: csv
 
 - type: basic
   topic: /stereo/camera2/metadata
   folder: camera_right_metadata
-  extension: csv
 
 - type: basic
   topic: /stereo/camera1/static_parameters
   folder: camera_left_static_parameters
-  extension: csv
 
 - type: basic
   topic: /stereo/camera2/static_parameters
   folder: camera_right_static_parameters
-  extension: csv
   
 - type: imu
   topic: /MTI_imu/data
   folder: imu
-  extension: csv
+  args:
+    euler: true
 
 - type: gnss
   topic: /gps_data_raw
   folder: gnss
-  extension: csv
 
 - type: basic
   topic: /nmea_sentence
   folder: gnss_nmea_raw
-  extension: csv
 
 - type: point_cloud
   topic: /velodyne_points
   folder: lidar
-  extension: csv
 

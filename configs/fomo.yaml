@@ -1,30 +1,30 @@
-- type: odometry
-  topic: /mapping/icp_odom
-  folder: icp_odom
-  args:
-    euler: true
+- type: gnss
+  topic: /emlid/front
+  folder: gnss_1
 
-- type: odometry
-  topic: /warthog_velocity_controller/odom
-  folder: wheel_odom
-  args:
-    euler: true
+- type: gnss
+  topic: /emlid/back
+  folder: gnss_2
 
-- type: odometry
-  topic: /reachrs/tessellate/odom
-  folder: rtk_odom
-  args:
-    euler: true
+- type: gnss
+  topic: /emlid/middle
+  folder: gnss_3
 
 - type: imu
   topic: /mti30/data
   folder: imu
   args:
+    euler: false
+
+- type: odometry
+  topic: /icp_odom
+  folder: icp_odom
+  args:
     euler: true
 
 - type: image
   topic: /zed_node/left_raw/image_raw_color
-  folder: ground/images
+  folder: zed_left
   args:
     extension: png
     rectify: false
@@ -34,6 +34,7 @@
 - type: basic
   topic: /battery_logs
   folder: power
+  extension: csv
 
 - type: audio
   topic: /audio/left_mic
