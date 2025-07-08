@@ -30,7 +30,7 @@ def extract_odom_from_rosbag(bag_file, topic_name, save_folder, args, overwrite=
             msg = reader.deserialize(rawdata, connection.msgtype)
 
             position = [msg.pose.pose.position.x, msg.pose.pose.position.y, msg.pose.pose.position.z]
-            orientation = [msg.orientation.x, msg.orientation.y, msg.orientation.z, msg.orientation.w]
+            orientation = [msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w]
             if euler:
                 orientation = Rotation.from_quat(orientation).as_euler("xyz", degrees=False)
             linear_velocity = [msg.twist.twist.linear.x, msg.twist.twist.linear.y, msg.twist.twist.linear.z]
