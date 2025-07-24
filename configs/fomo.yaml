@@ -3,49 +3,9 @@
   folder: gnss_1
 
 - type: gnss
-  topic: /emlid/back
+  topic: /emlid/left #middle = left
   folder: gnss_2
 
 - type: gnss
-  topic: /emlid/middle
+  topic: /emlid/right #back = right
   folder: gnss_3
-
-- type: imu
-  topic: /mti30/data
-  folder: imu
-  args:
-    euler: false
-
-- type: odometry
-  topic: /icp_odom
-  folder: icp_odom
-  args:
-    euler: true
-
-- type: image
-  topic: /zed_node/left_raw/image_raw_color
-  folder: zed_left
-  args:
-    extension: png
-    rectify: false
-    scaling_factor: 1.0
-    gray_scale: false
-
-- type: basic
-  topic: /battery_logs
-  folder: power
-  extension: csv
-
-- type: audio
-  topic: /audio/left_mic
-  folder: audio_left
-  args:
-    extension: wav
-    sample_rate: 44100
-
-- type: audio
-  topic: /audio/right_mic
-  folder: audio_right
-  args:
-    extension: wav
-    sample_rate: 44100
