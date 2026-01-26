@@ -1,0 +1,4 @@
+- type: odometry
+  topic: /mapping/icp_odom_offline
+  folder: icp_odom_offline
+  extension: csv

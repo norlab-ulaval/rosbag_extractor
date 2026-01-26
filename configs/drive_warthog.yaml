@@ -1,0 +1,39 @@
+- type: odometry
+  topic: /mapping/icp_odom
+  folder: icp_odom
+  extension: csv
+
+- type: basic
+  topic: /warthog/platform/motor/left/status/velocity
+  folder: left_wheel_vel
+  extension: csv
+
+- type: basic
+  topic: /warthog/platform/motor/right/status/velocity
+  folder: right_wheel_vel
+  extension: csv
+
+- type: basic
+  topic: /warthog/platform/motor/left/cmd_velocity
+  folder: left_wheel_cmd
+  extension: csv
+
+- type: basic
+  topic: /warthog/platform/motor/right/cmd_velocity
+  folder: right_wheel_cmd
+  extension: csv
+
+- type: basic
+  topic: /warthog/platform/motor/left/status/current_battery
+  folder: left_wheel_current
+  extension: csv
+
+- type: basic
+  topic: /warthog/platform/motor/right/status/current_battery
+  folder: right_wheel_current
+  extension: csv
+
+- type: imu
+  topic: /mti30/data
+  folder: imu
+  extension: csv

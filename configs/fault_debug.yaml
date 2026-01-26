@@ -1,0 +1,69 @@
+- type: basic
+  topic: /warthog/platform/motor/left/status/velocity
+  folder: left_wheel_vel
+  extension: csv
+
+- type: basic
+  topic: /warthog/platform/motor/right/status/velocity
+  folder: right_wheel_vel
+  extension: csv
+
+- type: basic
+  topic: /warthog/platform/motor/left/cmd_velocity
+  folder: left_wheel_cmd
+  extension: csv
+
+- type: basic
+  topic: /warthog/platform/motor/right/cmd_velocity
+  folder: right_wheel_cmd
+  extension: csv
+
+- type: basic
+  topic: /warthog/platform/motor/left/status/current_battery
+  folder: left_wheel_current
+  extension: csv
+
+- type: basic
+  topic: /warthog/platform/motor/right/status/current_battery
+  folder: right_wheel_current
+  extension: csv
+
+- type: basic
+  topic: /warthog/platform/motor/left/status/fault
+  folder: left_motor_fault
+  extension: csv
+
+- type: basic
+  topic: /warthog/platform/motor/right/status/fault
+  folder: right_motor_fault
+  extension: csv
+
+- type: basic
+  topic: /drive/viz/current_state
+  folder: drive_state
+  extension: csv
+
+- type: basic
+  topic: /warthog/platform/cmd_vel
+  folder: cmd_vel
+  extension: csv
+
+- type: basic
+  topic: /warthog/platform/motor/left/status/temperature_motor
+  folder: left_wheel_temperature
+  extension: csv
+
+- type: basic
+  topic: /warthog/platform/motor/right/status/temperature_motor
+  folder: right_wheel_temperature
+  extension: csv
+
+- type: basic
+  topic: /warthog/platform/motor/left/status/temperature_heatsink
+  folder: left_wheel_temperature_heatsink
+  extension: csv
+
+- type: basic
+  topic: /warthog/platform/motor/right/status/temperature_heatsink
+  folder: right_wheel_temperature_heatsink
+  extension: csv
