@@ -1,0 +1,16 @@
+- type: odometry
+  topic: /mapping/icp_odom_offline
+  folder: icp_odom
+  extension: csv
+
+
+- type: imu
+  topic: /mti100/data
+  folder: imu
+  extension: csv
+
+- type: twiststamped
+  topic: /controller/cmd_vel
+  folder: cmd_vel_remote
+  extension: csv
+  
