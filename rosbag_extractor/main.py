@@ -3,7 +3,7 @@
 import argparse
 import os
 import yaml
-from src.rosbag_extractor import RosbagExtractor
+from rosbag_extractor.rosbag_extractor import RosbagExtractor
 
 
 def load_config(name) -> dict:

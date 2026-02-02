@@ -1,0 +1,6 @@
+#!/home/vvannini/rosbag_extractor/.jazzy_extractor/bin/python3
+import sys
+from rosbags.convert.cli import main
+if __name__ == '__main__':
+    sys.argv[0] = sys.argv[0].removesuffix('.exe')
+    sys.exit(main())

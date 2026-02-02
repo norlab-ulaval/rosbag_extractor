@@ -1,0 +1,6 @@
+#!/home/vvannini/rosbag_extractor/.jazzy_extractor/bin/python3
+import sys
+from glymur.command_line import jpeg2jp2
+if __name__ == '__main__':
+    sys.argv[0] = sys.argv[0].removesuffix('.exe')
+    sys.exit(jpeg2jp2())

@@ -12,7 +12,7 @@ setup(
     install_requires=read_requirements(),
     entry_points={
         'console_scripts': [
-            'rosbag_extractor=src.main:main'
+            'rosbag_extractor=rosbag_extractor.main:main'
         ]
     }
 )

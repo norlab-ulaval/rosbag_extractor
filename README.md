@@ -70,3 +70,9 @@ Images extraction include extra parameters to achieve the desired output:
 | convert_12to8bits | bool      | Whether to convert 12 bits images to 8 bits before saving                               |
 | brackets          | list[int] | Sort extracted images in specified brackets folder (will look for <cam_topic>/metadata) |
 | basler_decompress | bool      | (Basler only) Decompress images, message type should be packets                         |
+
+
+**mtt_msgs** -> Messages of type `mtt_msgs/msg/MttTachometerData`, can be extracted to a single CSV file. The norlab_custom_msgs package must be installed to access these message types.
+
+
+**TwistStemped** -> Messages of type `geometry_msgs/msg/TwistStamped`.  Messages on this topic can be extracted into a CSV file containing all fields of the TwistStamped message, including timestamp, frame ID, linear velocities (x, y, z), and angular velocities (x, y, z).

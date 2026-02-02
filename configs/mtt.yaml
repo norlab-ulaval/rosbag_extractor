@@ -2,3 +2,7 @@
   topic: /mtt_tachometer
   folder: mtt_tachometer
   extension: csv
+- type: cmd_vel
+  topic: /controller/cmd_vel
+  folder: cmd_vel
+  extension: csv
