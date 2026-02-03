@@ -1,10 +1,11 @@
+glymur
 numpy
 opencv-python
+packaging
 pandas
-rosbags
+pillow
+pypylon
+PyYaml
+rosbags>=0.10
 scipy
 tqdm
-pillow
-glymur
-PyYaml
-pypylon

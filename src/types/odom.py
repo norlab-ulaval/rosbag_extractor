@@ -6,8 +6,6 @@ from rosbags.highlevel import AnyReader
 from tqdm import tqdm
 from scipy.spatial.transform import Rotation
 
-## NOTE: THIS ONLY EXTRACTS THE POSE IN THE ODOMETRY MESSAGE, NOT THE COVARIANCE NOR THE TWIST
-
 
 def extract_odom_from_rosbag(bag_file, topic_name, save_folder, args, overwrite=False):
 
@@ -25,8 +23,9 @@ def extract_odom_from_rosbag(bag_file, topic_name, save_folder, args, overwrite=
         # iterate over messages
         print(f"Extracting odometry data from topic \"{topic_name}\" to file \"{output_file.name}\"")
         connections = [x for x in reader.connections if x.topic == topic_name]
+        messages = list(reader.messages(connections=connections))
 
-        for connection, ros_time, rawdata in tqdm(reader.messages(connections=connections)):
+        for connection, ros_time, rawdata in tqdm(messages):
             msg = reader.deserialize(rawdata, connection.msgtype)
 
             position = [msg.pose.pose.position.x, msg.pose.pose.position.y, msg.pose.pose.position.z]

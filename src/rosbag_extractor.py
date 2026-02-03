@@ -9,6 +9,7 @@ from src.types.image import extract_images_from_rosbag
 from src.types.imu import extract_imu_from_rosbag
 from src.types.odom import extract_odom_from_rosbag
 from src.types.point_cloud import extract_point_clouds_from_rosbag
+from src.types.tf import extract_tf_from_rosbag
 
 
 class bcolors:
@@ -55,6 +56,7 @@ class RosbagExtractor:
                 "odometry": extract_odom_from_rosbag,
                 "point_cloud": extract_point_clouds_from_rosbag,
                 "image": extract_images_from_rosbag,
+                "tf": extract_tf_from_rosbag,
             }
 
             extractor = extractors.get(data["type"])
@@ -76,9 +78,7 @@ class RosbagExtractor:
             topic_name = data["topic"]
             if topic_name not in bag_topics:
                 if ignore_missing:
-                    print(
-                        f"{bcolors.WARNING}Warning: Topic {topic_name} not found in bag file. Ignoring...{bcolors.ENDC}"
-                    )
+                    print(f"{bcolors.WARNING}Warning: Topic {topic_name} not found in bag file. Ignoring...{bcolors.ENDC}")
                     to_remove.append(i)
                     continue
                 else:

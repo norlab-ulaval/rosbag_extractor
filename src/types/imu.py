@@ -23,8 +23,9 @@ def extract_imu_from_rosbag(bag_file, topic_name, save_folder, args, overwrite=F
         # iterate over messages
         print(f"Extracting IMU data from topic \"{topic_name}\" to file \"{output_file.name}\"")
         connections = [x for x in reader.connections if x.topic == topic_name]
+        messages = list(reader.messages(connections=connections))
 
-        for connection, ros_time, rawdata in tqdm(reader.messages(connections=connections)):
+        for connection, ros_time, rawdata in tqdm(messages):
             msg = reader.deserialize(rawdata, connection.msgtype)
 
             orientation = [msg.orientation.x, msg.orientation.y, msg.orientation.z, msg.orientation.w]

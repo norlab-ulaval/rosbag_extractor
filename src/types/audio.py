@@ -3,7 +3,7 @@ from pathlib import Path
 
 import numpy as np
 from rosbags.highlevel import AnyReader
-from rosbags.typesys import get_types_from_msg, register_types
+from rosbags.typesys import get_types_from_msg, get_typestore, Stores
 from tqdm import tqdm
 
 # Audio message
@@ -17,8 +17,10 @@ std_msgs/Header header
 audio_common_msgs/AudioData audio
 """
 
-register_types(get_types_from_msg(AUDIO_DATA_MSG, "audio_common_msgs/msg/AudioData"))
-register_types(get_types_from_msg(AUDIO_DATA_STAMPED_MSG, "audio_common_msgs/msg/AudioDataStamped"))
+# Register custom types with the typestore
+typestore = get_typestore(Stores.LATEST)
+typestore.register(get_types_from_msg(AUDIO_DATA_MSG, "audio_common_msgs/msg/AudioData"))
+typestore.register(get_types_from_msg(AUDIO_DATA_STAMPED_MSG, "audio_common_msgs/msg/AudioDataStamped"))
 
 
 def extract_audio_from_rosbag(bag_file, topic_name, save_folder, args, overwrite=False):
@@ -37,7 +39,9 @@ def extract_audio_from_rosbag(bag_file, topic_name, save_folder, args, overwrite
         audio_data = bytearray()
         print(f"Extracting audio data from topic \"{topic_name}\" to file \"{output_file.name}\"")
         connections = [x for x in reader.connections if x.topic == topic_name]
-        for connection, _, rawdata in tqdm(reader.messages(connections=connections)):
+        messages = list(reader.messages(connections=connections))
+        
+        for connection, _, rawdata in tqdm(messages):
             msg = reader.deserialize(rawdata, connection.msgtype)
             if connection.msgtype == "audio_common_msgs/msg/AudioData":
                 audio_data.extend(msg.data)

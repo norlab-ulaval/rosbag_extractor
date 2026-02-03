@@ -25,8 +25,9 @@ def extract_basic_data_from_rosbag(bag_file, topic_name, save_folder, args, over
         print(f"Extracting basic data from topic \"{topic_name}\" to file \"{output_file.name}\"")
         connections = [x for x in reader.connections if x.topic == topic_name]
         columns = _init_columns(reader, connections)
+        messages = list(reader.messages(connections=connections))
 
-        for connection, ros_time, rawdata in tqdm(reader.messages(connections=connections)):
+        for connection, ros_time, rawdata in tqdm(messages):
 
             msg = reader.deserialize(rawdata, connection.msgtype)
             msg_dict = _class_to_dict(msg)
