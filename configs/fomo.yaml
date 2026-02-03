@@ -1,7 +1,6 @@
 - type: gnss
   topic: /emlid/front
   folder: gnss_1
-
 - type: gnss
   topic: /emlid/left #middle = left
   folder: gnss_2
@@ -9,3 +8,15 @@
 - type: gnss
   topic: /emlid/right #back = right
   folder: gnss_3
+
+- type: basic
+  topic: /emlid/front/status
+  folder: status_1
+
+- type: basic
+  topic: /emlid/left/status
+  folder: status_2
+
+- type: basic
+  topic: /emlid/right/status
+  folder: status_3

@@ -1,13 +1,13 @@
 - type: gnss
-  topic: /reachrs/front/fix
+  topic: /emlid/front/fix
   folder: gnss_1
 
 - type: gnss
-  topic: /reachrs/left/fix #middle = left
+  topic: /emlid/left/fix #middle = left
   folder: gnss_2
 
 - type: gnss
-  topic: /reachrs/right/fix #back = right
+  topic: /emlid/right/fix #back = right
   folder: gnss_3
 
 - type: odometry
