@@ -73,33 +73,3 @@ class TFBuffer:
         trans = result[:3, 3]
         rot = Rotation.from_matrix(result[:3, :3]).as_quat()
         return trans, rot
-
-
-def euler_from_quaternion(x, y, z, w):
-    """
-    Convert quaternion to Euler angles (roll, pitch, yaw).
-    
-    Args:
-        x, y, z, w: Quaternion components
-        
-    Returns:
-        tuple: (roll, pitch, yaw) in radians
-    """
-    # Roll (x-axis rotation)
-    sinr_cosp = 2 * (w * x + y * z)
-    cosr_cosp = 1 - 2 * (x * x + y * y)
-    roll = math.atan2(sinr_cosp, cosr_cosp)
-
-    # Pitch (y-axis rotation)
-    sinp = 2 * (w * y - z * x)
-    if abs(sinp) >= 1:
-        pitch = math.copysign(math.pi / 2, sinp)
-    else:
-        pitch = math.asin(sinp)
-
-    # Yaw (z-axis rotation)
-    siny_cosp = 2 * (w * z + x * y)
-    cosy_cosp = 1 - 2 * (y * y + z * z)
-    yaw = math.atan2(siny_cosp, cosy_cosp)
-
-    return roll, pitch, yaw

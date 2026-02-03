@@ -8,6 +8,7 @@ from src.types.gnss import extract_gnss_from_rosbag
 from src.types.image import extract_images_from_rosbag
 from src.types.imu import extract_imu_from_rosbag
 from src.types.odom import extract_odom_from_rosbag
+from src.types.pose import extract_pose_from_rosbag
 from src.types.point_cloud import extract_point_clouds_from_rosbag
 from src.types.tf import extract_tf_from_rosbag
 
@@ -54,6 +55,7 @@ class RosbagExtractor:
                 "gnss": extract_gnss_from_rosbag,
                 "audio": extract_audio_from_rosbag,
                 "odometry": extract_odom_from_rosbag,
+                "pose": extract_pose_from_rosbag,
                 "point_cloud": extract_point_clouds_from_rosbag,
                 "image": extract_images_from_rosbag,
                 "tf": extract_tf_from_rosbag,

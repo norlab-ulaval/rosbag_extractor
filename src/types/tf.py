@@ -2,9 +2,10 @@ from pathlib import Path
 
 import pandas as pd
 from rosbags.highlevel import AnyReader
+from scipy.spatial.transform import Rotation
 from tqdm import tqdm
 
-from src.utils import TFBuffer, euler_from_quaternion
+from src.utils import TFBuffer
 
 
 def extract_tf_from_rosbag(bag_file, topic_name, save_folder, args, overwrite):
@@ -98,7 +99,7 @@ def _extract_transforms(messages, tf_buffer, base_frame, target_frames, use_eule
             try:
                 trans, rot = tf_buffer.lookup_transform(target_frame, base_frame)
                 if use_euler:
-                    rot = euler_from_quaternion(*rot)
+                    rot = Rotation.from_quat(rot).as_euler('xyz', degrees=False)
 
                 frame_data[target_frame].append([timestamp_ns, *trans, *rot])
             except Exception:

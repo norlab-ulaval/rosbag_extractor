@@ -13,7 +13,7 @@ pip install -e .
 # Usage
 
 ```bash
-usage: rosbag_extractor [-h] [-i INPUT] [-c CONFIG] [-o OUTPUT] [--ignore-missing] [--overwrite]
+usage: rosbag_extractor [-h] [-i INPUT] [-c CONFIG] [-o OUTPUT] [--ignore-missing] [--overwrite] [--silent]
 
 Extract data from a rosbag file to a directory.
 
@@ -27,6 +27,7 @@ options:
                         Output directory.
   --ignore-missing      Ignore missing topics in the config file.
   --overwrite           Overwrite existing files in the output directory.
+  --silent              Silent mode - suppress all output to terminal.
 ```
 
 To use, create a config in the `configs` folder, which must be a list of dictionaries, each containing the following information:
@@ -52,6 +53,8 @@ The following types are currently implemented in the tool:
 **audio** -> Messages of type `audio_common_msgs/msg/AudioData` or `audio_common_msgs/msg/AudioDataStamped`, can be extracted to a single MP3 or WAV file.
 
 **odometry** -> Messages of type `nav_msgs/msg/Odometry`, can be extracted to a single CSV file including timestamps.
+
+**pose** -> Messages of type `geometry_msgs/msg/PoseStamped`, can be extracted to a single CSV file including timestamps.
 
 **point_cloud** -> Messages of type `sensor_msgs/msg/PointCloud2`, can be extracted to a single CSV file per point cloud, named by timestamp.
 
