@@ -47,8 +47,11 @@ def extract_images_from_rosbag(bag_file, topic_name, save_folder, args, overwrit
         return
 
     with AnyReader([Path(bag_file)]) as reader:
-        if "rectify" in args and args["rectify"]:
-            K, D = get_camera_calibration_matrix(reader, topic_name)
+        # Save camera calibration if available
+        save_camera_calibration(reader, topic_name, save_folder)
+        
+        if rectify:
+            K, D, distortion_model = get_camera_calibration_matrix(reader, topic_name)
 
         # iterate over messages
         print(f"Extracting images from topic \"{topic_name}\" to folder \"{save_folder.split('/')[-1]}\"")
@@ -69,7 +72,10 @@ def extract_images_from_rosbag(bag_file, topic_name, save_folder, args, overwrit
             if debayer and "bayer" in msg.encoding:
                 np_image = cv2.cvtColor(np_image, cv2.COLOR_BayerRG2RGB)
             if rectify:
-                np_image = cv2.undistort(np_image, K, D)
+                if distortion_model in ["equidistant", "fisheye"]:
+                    np_image = cv2.fisheye.undistortImage(np_image, K, D, Knew=K)
+                else:
+                    np_image = cv2.undistort(np_image, K, D)
             if scale != 1.0:
                 np_image = cv2.resize(np_image, (0, 0), fx=scale, fy=scale)
             if gray_scale and len(np_image.shape) == 3:
@@ -80,7 +86,7 @@ def extract_images_from_rosbag(bag_file, topic_name, save_folder, args, overwrit
                 Jp2k(
                     os.path.join(save_folder, f"{int(timestamp):d}.{ext}"),
                     data=np_image,
-                    cratios=[args["quality_factor"]],
+                    cratios=[quality_factor],
                 )
             else:
                 cv2.imwrite(os.path.join(save_folder, f"{int(timestamp):d}.{ext}"), np_image)
@@ -90,11 +96,57 @@ def extract_images_from_rosbag(bag_file, topic_name, save_folder, args, overwrit
 
     print(f"Done! Extracted images to {save_folder}")
 
+def save_camera_calibration(reader, topic_name, output_folder):
+    """Save camera calibration in OpenCV YAML format."""
+
+    topic_base = topic_name.replace("/compressed", "")
+    camera_info_topic = "/".join(topic_base.split("/")[:-1] + ["camera_info"])
+    connections = [x for x in reader.connections if x.topic == camera_info_topic]
+
+    if not connections:
+        return
+
+    for connection, _, rawdata in reader.messages(connections=connections):
+        camera_info = reader.deserialize(rawdata, connection.msgtype)
+        
+        # Extract calibration data
+        try:
+            K = np.array(camera_info.k).reshape([3, 3])
+            D = np.array(camera_info.d)
+            P = np.array(camera_info.p).reshape([3, 4])
+            R = np.array(camera_info.r).reshape([3, 3])
+        except:
+            K = np.array(camera_info.K).reshape([3, 3])
+            D = np.array(camera_info.D)
+            P = np.array(camera_info.P).reshape([3, 4])
+            R = np.array(camera_info.R).reshape([3, 3])
+        
+        distortion_model = getattr(camera_info, 'distortion_model', 'plumb_bob')
+        width = camera_info.width
+        height = camera_info.height
+        
+        # Save in OpenCV YAML format
+        calibration_file = os.path.join(output_folder, "camera_calibration.yaml")
+        
+        fs = cv2.FileStorage(calibration_file, cv2.FILE_STORAGE_WRITE)
+        fs.write("image_width", int(width))
+        fs.write("image_height", int(height))
+        fs.write("camera_matrix", K)
+        fs.write("distortion_model", distortion_model)
+        fs.write("distortion_coefficients", D)
+        fs.write("rectification_matrix", R)
+        fs.write("projection_matrix", P)
+        fs.release()
+        
+        print(f"Saved camera calibration to {calibration_file}")
+        break
 
 def get_camera_calibration_matrix(reader, topic_name):
-    """Extract camera calibration matrix from rosbag."""
+    """Extract camera calibration matrix and distortion model from rosbag."""
 
-    camera_info_topic = "/".join(topic_name.split("/")[:-1] + ["camera_info"])
+
+    topic_base = topic_name.replace("/compressed", "")
+    camera_info_topic = "/".join(topic_base.split("/")[:-1] + ["camera_info"])
     connections = [x for x in reader.connections if x.topic == camera_info_topic]
 
     if not connections:
@@ -108,12 +160,29 @@ def get_camera_calibration_matrix(reader, topic_name):
         except:
             K = np.array(camera_info.K).reshape([3, 3])
             D = np.array(camera_info.D)
+        
+        # Extract distortion model (default to plumb_bob if not specified)
+        distortion_model = getattr(camera_info, 'distortion_model', 'plumb_bob')
         break
 
-    return K, D
+    return K, D, distortion_model
 
 
 def image_to_numpy(msg):
+    """
+    Convert ROS Image or CompressedImage message to numpy array.
+    Handles both sensor_msgs/Image and sensor_msgs/CompressedImage.
+    """
+    # Check if it's a CompressedImage
+    if hasattr(msg, 'format'):
+        # CompressedImage - decode using OpenCV
+        np_arr = np.frombuffer(msg.data, np.uint8)
+        image = cv2.imdecode(np_arr, cv2.IMREAD_UNCHANGED)
+        if image is None:
+            raise ValueError(f"Failed to decode compressed image with format: {msg.format}")
+        return image
+    
+    # Regular Image message
     # Taken from https://github.com/eric-wieser/ros_numpy
 
     if not msg.encoding in ENCODINGS:
@@ -146,7 +215,8 @@ def sort_bracket_images(bag_file, image_topic, images_folder, image_ext, args):
         # iterate over messages
         print(f'Sorting images from folder "{images_folder}"')
         connections = [x for x in reader.connections if x.topic == metadata_topic]
-        for connection, _, rawdata in tqdm(reader.messages(connections=connections)):
+        messages = list(reader.messages(connections=connections))
+        for connection, _, rawdata in tqdm(messages):
             msg = reader.deserialize(rawdata, connection.msgtype)
             timestamp = msg.header.stamp.sec * 1e9 + msg.header.stamp.nanosec
             idx = (np.abs(brackets - msg.ExposureTime)).argmin()
