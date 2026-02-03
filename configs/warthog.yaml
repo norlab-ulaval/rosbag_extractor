@@ -28,7 +28,7 @@
   args:
     extension: png
     rectify: false
-    scaling_factor: 1.0
+    scale: 1.0
     gray_scale: false
 
 - type: basic

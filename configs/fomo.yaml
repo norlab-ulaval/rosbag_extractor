@@ -1,6 +1,7 @@
 - type: gnss
   topic: /emlid/front
   folder: gnss_1
+  
 - type: gnss
   topic: /emlid/left #middle = left
   folder: gnss_2

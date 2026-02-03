@@ -38,7 +38,7 @@
   args:
     extension: png
     rectify: true
-    scaling_factor: 1.0
+    scale: 1.0
     gray_scale: false
 
 - type: image
@@ -47,7 +47,7 @@
   args:
     extension: png
     rectify: true
-    scaling_factor: 1.0
+    scale: 1.0
     gray_scale: false
 
 - type: point_cloud

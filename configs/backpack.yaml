@@ -1,8 +1,8 @@
 - type: image
   topic: /stereo/camera1/image_compressed
   folder: camera_left
-  extension: png
   args:
+    extension: png
     rectify: false
     scale: 1.0
     debayer: false
@@ -13,8 +13,8 @@
 - type: image
   topic: /stereo/camera2/image_compressed
   folder: camera_right
-  extension: png
   args:
+    extension: png
     rectify: false
     scale: 1.0
     debayer: false

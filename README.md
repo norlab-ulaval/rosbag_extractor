@@ -37,7 +37,6 @@ To use, create a config in the `configs` folder, which must be a list of diction
 | type      | Type of data to handle (see supported types below) |
 | topic     | Name of the topic to extract                       |
 | folder    | Name of the subfolder where to extract the data    |
-| extension | File extension for the extracted data              |
 | args      | Extra arguments for some data types                |
 
 # Supported types
@@ -68,6 +67,7 @@ Images extraction include extra parameters to achieve the desired output:
 
 | Args              | Type      | Description                                                                             |
 | ----------------- | --------- | --------------------------------------------------------------------------------------- |
+| extension         | str       | Image file format (e.g., 'png', 'jpg'). Default: 'png'                                  |
 | rectify           | bool      | Whether to rectify the images (will look for <cam_topic>/camera_info). Supports fisheye/equidistant distortion models |
 | scale             | float     | Factor to rescale the images (1.0 will leave them unchanged)                            |
 | debayer           | bool      | Whether to convert the bayer image to RGB before saving                                 |
