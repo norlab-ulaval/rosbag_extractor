@@ -55,7 +55,9 @@ The following types are currently implemented in the tool:
 
 **point_cloud** -> Messages of type `sensor_msgs/msg/PointCloud2`, can be extracted to a single CSV file per point cloud, named by timestamp.
 
-**image** -> Messages of type `sensor_msgs/msg/Image`, that will be directly decoded and saved as single images named by timestamps.
+**image** -> Messages of type `sensor_msgs/msg/Image` or `sensor_msgs/msg/CompressedImage`, that will be directly decoded and saved as single images named by timestamps.
+
+**tf** -> Extract TF transforms from `/tf` and `/tf_static` topics between a base frame and multiple target frames to CSV files.
 
 ## Images
 
@@ -63,10 +65,24 @@ Images extraction include extra parameters to achieve the desired output:
 
 | Args              | Type      | Description                                                                             |
 | ----------------- | --------- | --------------------------------------------------------------------------------------- |
-| rectify           | bool      | Whether to rectify the images (will look for <cam_topic>/camera_info)                   |
+| rectify           | bool      | Whether to rectify the images (will look for <cam_topic>/camera_info). Supports fisheye/equidistant distortion models |
 | scale             | float     | Factor to rescale the images (1.0 will leave them unchanged)                            |
 | debayer           | bool      | Whether to convert the bayer image to RGB before saving                                 |
-| quality_factor    | float     | (JPG-only) Compress extracted images to reduce size on disk, needs to be 1.0 or lower   |
+| gray_scale        | bool      | Whether to convert images to grayscale before saving                                    |
+| quality_factor    | float     | Compress extracted images to reduce size on disk (use with JPEG2000), needs to be 1.0 or lower |
 | convert_12to8bits | bool      | Whether to convert 12 bits images to 8 bits before saving                               |
 | brackets          | list[int] | Sort extracted images in specified brackets folder (will look for <cam_topic>/metadata) |
 | basler_decompress | bool      | (Basler only) Decompress images, message type should be packets                         |
+
+
+## TF Transforms
+
+TF extraction allows extracting transform data between frames:
+
+| Args           | Type       | Description                                                             |
+| -------------- | ---------- | ----------------------------------------------------------------------- |
+| base_frame     | str        | Source frame for transforms (e.g., 'odom') - **required**               |
+| target_frames  | list       | List of target frames to extract (e.g., ['base_link']) - **required**   |
+| use_euler      | bool       | Output Euler angles (roll, pitch, yaw) instead of quaternions           |
+| sample_rate    | float      | Downsample transforms to specified frequency (e.g., 100.0)              |
+
