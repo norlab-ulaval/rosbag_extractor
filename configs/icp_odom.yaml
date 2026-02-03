@@ -1,0 +1,5 @@
+- type: odometry
+  topic: /icp_pose
+  folder: icp_pose
+  args: 
+    euler: false

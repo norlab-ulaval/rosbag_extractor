@@ -18,10 +18,15 @@ DATA_TYPES = {
 }
 
 
-def extract_point_clouds_from_rosbag(bag_file, topic_name, output_folder):
+def extract_point_clouds_from_rosbag(bag_file, topic_name, save_folder, args, overwrite=False):
+
+    # Avoid overwriting existing files
+    if not overwrite and Path(save_folder).exists() and any(Path(save_folder).iterdir()):
+        print(f"Output folder {save_folder} already exists and not empty. Skipping...")
+        return
 
     with AnyReader([Path(bag_file)]) as reader:
-        print(f"Extracting point clouds from topic \"{topic_name}\" to folder \"{output_folder.split('/')[-1]}\"")
+        print(f"Extracting point clouds from topic \"{topic_name}\" to folder \"{save_folder.split('/')[-1]}\"")
         connections = [x for x in reader.connections if x.topic == topic_name]
         for connection, _, rawdata in tqdm(reader.messages(connections=connections)):
             msg = reader.deserialize(rawdata, connection.msgtype)
@@ -32,4 +37,6 @@ def extract_point_clouds_from_rosbag(bag_file, topic_name, output_folder):
                 type = DATA_TYPES[field.datatype]
                 n_bytes = np.dtype(type).itemsize
                 df[field.name] = data[:, field.offset : field.offset + n_bytes].flatten().view(dtype=type)
-            df.to_csv(os.path.join(output_folder, f"{int(timestamp):d}.csv"), index=False)
+            df.to_csv(os.path.join(save_folder, f"{int(timestamp):d}.csv"), index=False)
+
+    print(f"Done! Extracted point clouds to {save_folder}")

@@ -30,50 +30,63 @@ ENCODINGS = {
 }
 
 
-def extract_images_from_rosbag(bag_file, topic_name, output_folder, args, image_ext="png"):
+def extract_images_from_rosbag(bag_file, topic_name, save_folder, args, overwrite):
 
-    if "quality_factor" in args and args["quality_factor"] < 1 and image_ext == "png":
-        raise ValueError("Quality factor can not be used with PNG images.")
+    ext = args.get("extension", "png")
+    quality_factor = args.get("quality_factor", 1.0)
+    basler_decompress = args.get("basler_decompress", False)
+    convert_12to8bits = args.get("convert_12to8bits", False)
+    debayer = args.get("debayer", False)
+    rectify = args.get("rectify", False)
+    scale = args.get("scale", 1.0)
+    gray_scale = args.get("gray_scale", False)
+
+    # Avoid overwriting existing files
+    if not overwrite and Path(save_folder).exists() and any(Path(save_folder).iterdir()):
+        print(f"Output folder {save_folder} already exists and not empty. Skipping...")
+        return
 
     with AnyReader([Path(bag_file)]) as reader:
         if "rectify" in args and args["rectify"]:
             K, D = get_camera_calibration_matrix(reader, topic_name)
 
         # iterate over messages
-        print(f"Extracting images from topic \"{topic_name}\" to folder \"{output_folder.split('/')[-1]}\"")
+        print(f"Extracting images from topic \"{topic_name}\" to folder \"{save_folder.split('/')[-1]}\"")
         connections = [x for x in reader.connections if x.topic == topic_name]
         for connection, _, rawdata in tqdm(reader.messages(connections=connections)):
             msg = reader.deserialize(rawdata, connection.msgtype)
             timestamp = msg.header.stamp.sec * 1e9 + msg.header.stamp.nanosec
 
-            if "basler_decompress" in args and args["basler_decompress"]:
+            if basler_decompress:
                 np_image = decompress_image(msg)
             else:
                 np_image = image_to_numpy(msg)
 
-            if "convert_12to8bits" in args and args["convert_12to8bits"]:
+            if convert_12to8bits and np_image.dtype == np.uint16:
                 np_image = (np_image / 16).astype(np.uint8)
-            if "debayer" in args and args["debayer"]:
+            if debayer and "bayer" in msg.encoding:
                 np_image = cv2.cvtColor(np_image, cv2.COLOR_BayerRG2RGB)
-            if "rectify" in args and args["rectify"]:
+            if rectify:
                 np_image = cv2.undistort(np_image, K, D)
-            if "scale" in args and args["scale"] != 1.0:
-                np_image = cv2.resize(np_image, (0, 0), fx=args["scale"], fy=args["scale"])
-            if "gray_scale" in args and args["gray_scale"]:
+            if scale != 1.0:
+                np_image = cv2.resize(np_image, (0, 0), fx=scale, fy=scale)
+            if gray_scale and len(np_image.shape) == 3:
                 np_image = cv2.cvtColor(np_image, cv2.COLOR_BGR2GRAY)
 
             # Save image
-            if "quality_factor" in args and args["quality_factor"] < 1.0:
-                jp2 = Jp2k(
-                    os.path.join(output_folder, f"{int(timestamp):d}.{image_ext}"),
+            if quality_factor < 1.0 and ext.lower() == "jpg":
+                Jp2k(
+                    os.path.join(save_folder, f"{int(timestamp):d}.{ext}"),
                     data=np_image,
                     cratios=[args["quality_factor"]],
                 )
             else:
-                cv2.imwrite(os.path.join(output_folder, f"{int(timestamp):d}.{image_ext}"), np_image)
+                cv2.imwrite(os.path.join(save_folder, f"{int(timestamp):d}.{ext}"), np_image)
 
     if "brackets" in args:
-        sort_bracket_images(bag_file, topic_name, output_folder, image_ext, args)
+        sort_bracket_images(bag_file, topic_name, save_folder, ext, args)
+
+    print(f"Done! Extracted images to {save_folder}")
 
 
 def get_camera_calibration_matrix(reader, topic_name):

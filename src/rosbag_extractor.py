@@ -5,26 +5,10 @@ from rosbags.highlevel import AnyReader
 from src.types.audio import extract_audio_from_rosbag
 from src.types.basic import extract_basic_data_from_rosbag
 from src.types.gnss import extract_gnss_from_rosbag
-from src.types.image import extract_images_from_rosbag, sort_bracket_images
+from src.types.image import extract_images_from_rosbag
 from src.types.imu import extract_imu_from_rosbag
 from src.types.odom import extract_odom_from_rosbag
 from src.types.point_cloud import extract_point_clouds_from_rosbag
-
-########## EXAMPLE OF CONFIG FILE ##########
-
-# - type: odometry
-#   topic: /warthog_velocity_controller/odom
-#   folder: wheel_odom
-#   extension: csv
-
-# - type: image
-#   topic: /zed_node/left_raw/image_raw_color
-#   folder: camera_left
-#   extension: png
-
-# See full examples in ./configs folder
-
-############################################
 
 
 class bcolors:
@@ -46,6 +30,7 @@ class RosbagExtractor:
         if not os.path.exists(bag_file):
             raise Exception(f"Bag file {bag_file} not found.")
 
+
     def extract_data(self, output_folder, overwrite=False, ignore_missing=False):
 
         self.output_folder = output_folder
@@ -57,39 +42,29 @@ class RosbagExtractor:
             if not data["folder"]:
                 raise Exception("Folder name not provided in config file.")
 
-            data_folder = os.path.join(self.output_folder, data["folder"])
-            os.makedirs(data_folder, exist_ok=True)
+            save_folder = os.path.join(self.output_folder, data["folder"])
+            os.makedirs(save_folder, exist_ok=True)
 
-            output_file = os.path.join(data_folder, f"{data['folder']}.{data['extension']}")
-            if not overwrite and os.path.exists(output_file):
-                print(f"{bcolors.WARNING}Output file {output_file} already exists. Skipping...{bcolors.ENDC}")
-                continue
+            args = data.get("args", {})
 
-            if data["type"] == "basic":
-                extract_basic_data_from_rosbag(self.bag_file, data["topic"], output_file)
+            extractors = {
+                "basic": extract_basic_data_from_rosbag,
+                "imu": extract_imu_from_rosbag,
+                "gnss": extract_gnss_from_rosbag,
+                "audio": extract_audio_from_rosbag,
+                "odometry": extract_odom_from_rosbag,
+                "point_cloud": extract_point_clouds_from_rosbag,
+                "image": extract_images_from_rosbag,
+            }
 
-            elif data["type"] == "imu":
-                extract_imu_from_rosbag(self.bag_file, data["topic"], output_file)
-
-            elif data["type"] == "gnss":
-                extract_gnss_from_rosbag(self.bag_file, data["topic"], output_file)
-
-            elif data["type"] == "audio":
-                extract_audio_from_rosbag(self.bag_file, data["topic"], output_file)
-
-            elif data["type"] == "odometry":
-                extract_odom_from_rosbag(self.bag_file, data["topic"], output_file)
-
-            elif data["type"] == "point_cloud":
-                extract_point_clouds_from_rosbag(self.bag_file, data["topic"], data_folder)
-
-            elif data["type"] == "image":
-                extract_images_from_rosbag(self.bag_file, data["topic"], data_folder, data["args"], data["extension"])
-
+            extractor = extractors.get(data["type"])
+            if extractor:
+                extractor(self.bag_file, data["topic"], save_folder, args, overwrite)
             else:
                 raise Exception(f"{bcolors.FAIL}Unsupported data type: {data['type']}!{bcolors.ENDC}")
 
-            print(f"{bcolors.OKGREEN}Done! Exported to {data_folder}.{bcolors.ENDC}")
+            print("-" * 50)
+
 
     def _check_requested_topics(self, ignore_missing=False):
 

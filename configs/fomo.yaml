@@ -1,0 +1,11 @@
+- type: gnss
+  topic: /emlid/front
+  folder: gnss_1
+
+- type: gnss
+  topic: /emlid/left #middle = left
+  folder: gnss_2
+
+- type: gnss
+  topic: /emlid/right #back = right
+  folder: gnss_3
