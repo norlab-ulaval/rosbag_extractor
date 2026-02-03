@@ -9,6 +9,7 @@ setup(
     name='rosbag_extractor',
     version='0.1',
     packages=find_packages(),
+    package_dir={'': '.'},
     install_requires=read_requirements(),
     entry_points={
         'console_scripts': [
