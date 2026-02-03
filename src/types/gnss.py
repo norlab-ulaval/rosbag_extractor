@@ -19,7 +19,9 @@ def extract_gnss_from_rosbag(bag_file, topic_name, save_folder, args, overwrite=
         # iterate over messages
         print(f"Extracting GNSS data from topic \"{topic_name}\" to file \"{output_file.name}\"")
         connections = [x for x in reader.connections if x.topic == topic_name]
-        for connection, ros_time, rawdata in tqdm(reader.messages(connections=connections)):
+        messages = list(reader.messages(connections=connections))
+        
+        for connection, ros_time, rawdata in tqdm(messages):
             msg = reader.deserialize(rawdata, connection.msgtype)
             gnss_data.append(
                 [

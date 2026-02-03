@@ -37,7 +37,9 @@ def extract_audio_from_rosbag(bag_file, topic_name, save_folder, args, overwrite
         audio_data = bytearray()
         print(f"Extracting audio data from topic \"{topic_name}\" to file \"{output_file.name}\"")
         connections = [x for x in reader.connections if x.topic == topic_name]
-        for connection, _, rawdata in tqdm(reader.messages(connections=connections)):
+        messages = list(reader.messages(connections=connections))
+        
+        for connection, _, rawdata in tqdm(messages):
             msg = reader.deserialize(rawdata, connection.msgtype)
             if connection.msgtype == "audio_common_msgs/msg/AudioData":
                 audio_data.extend(msg.data)

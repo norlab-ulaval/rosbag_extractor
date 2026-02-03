@@ -53,7 +53,9 @@ def extract_images_from_rosbag(bag_file, topic_name, save_folder, args, overwrit
         # iterate over messages
         print(f"Extracting images from topic \"{topic_name}\" to folder \"{save_folder.split('/')[-1]}\"")
         connections = [x for x in reader.connections if x.topic == topic_name]
-        for connection, _, rawdata in tqdm(reader.messages(connections=connections)):
+        messages = list(reader.messages(connections=connections))
+        
+        for connection, _, rawdata in tqdm(messages):
             msg = reader.deserialize(rawdata, connection.msgtype)
             timestamp = msg.header.stamp.sec * 1e9 + msg.header.stamp.nanosec
 
