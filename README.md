@@ -2,6 +2,7 @@
 
 A python utility to convert rosbags into human-readable data.
 
+
 # Installation
 
 It is suggested to install the module with pip: 
@@ -39,6 +40,7 @@ To use, create a config in the `configs` folder, which must be a list of diction
 | folder    | Name of the subfolder where to extract the data    |
 | args      | Extra arguments for some data types                |
 
+
 # Supported types
 
 The following types are currently implemented in the tool:
@@ -53,13 +55,14 @@ The following types are currently implemented in the tool:
 
 **odometry** -> Messages of type `nav_msgs/msg/Odometry`, can be extracted to a single CSV file including timestamps.
 
-**pose** -> Messages of type `geometry_msgs/msg/PoseStamped`, can be extracted to a single CSV file including timestamps.
+**pose** -> Messages of type `geometry_msgs/msg/Pose` or `geometry_msgs/msg/PoseStamped`, can be extracted to a single CSV file including timestamps.
 
 **point_cloud** -> Messages of type `sensor_msgs/msg/PointCloud2`, can be extracted to a single CSV file per point cloud, named by timestamp.
 
 **image** -> Messages of type `sensor_msgs/msg/Image` or `sensor_msgs/msg/CompressedImage`, that will be directly decoded and saved as single images named by timestamps.
 
 **tf** -> Extract TF transforms from `/tf` and `/tf_static` topics between a base frame and multiple target frames to CSV files.
+
 
 ## Images
 
@@ -88,4 +91,15 @@ TF extraction allows extracting transform data between frames:
 | target_frames  | list       | List of target frames to extract (e.g., ['base_link']) - **required**   |
 | use_euler      | bool       | Output Euler angles (roll, pitch, yaw) instead of quaternions           |
 | sample_rate    | float      | Downsample transforms to specified frequency (e.g., 100.0)              |
+
+
+## Time Columns
+
+Extracted CSV files may contain different time-related columns depending on the message type:
+
+- **timestamp**: The most reliable timestamp (nanoseconds since epoch). For stamped messages (e.g., `PoseStamped`, `Imu`), this is the timestamp from the message header. For unstamped messages (e.g., `Pose`), this is the time when the message was logged to the bag. This column is always present.
+
+- **ros_time**: The time when the message was logged/recorded to the bag (nanoseconds since epoch). This column is present for all message types.
+
+For unstamped messages, `timestamp` and `ros_time` will have the same value since no header timestamp is available.
 

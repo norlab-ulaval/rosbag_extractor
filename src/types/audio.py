@@ -43,9 +43,9 @@ def extract_audio_from_rosbag(bag_file, topic_name, save_folder, args, overwrite
         
         for connection, _, rawdata in tqdm(messages):
             msg = reader.deserialize(rawdata, connection.msgtype)
-            if connection.msgtype == "audio_common_msgs/msg/AudioData":
+            if connection.msgtype.endswith("AudioData"):
                 audio_data.extend(msg.data)
-            elif connection.msgtype == "audio_common_msgs/msg/AudioDataStamped":
+            elif connection.msgtype.endswith("AudioDataStamped"):
                 audio_data.extend(msg.audio.data)
             else:
                 print(f"Unknown audio message type: {connection.msgtype}")

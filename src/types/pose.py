@@ -27,14 +27,23 @@ def extract_pose_from_rosbag(bag_file, topic_name, save_folder, args, overwrite=
         for connection, ros_time, rawdata in tqdm(messages):
             msg = reader.deserialize(rawdata, connection.msgtype)
 
-            position = [msg.pose.position.x, msg.pose.position.y, msg.pose.position.z]
-            orientation = [msg.pose.orientation.x, msg.pose.orientation.y, msg.pose.orientation.z, msg.pose.orientation.w]
+            if connection.msgtype.endswith("PoseStamped"):
+                position = [msg.pose.position.x, msg.pose.position.y, msg.pose.position.z]
+                orientation = [msg.pose.orientation.x, msg.pose.orientation.y, msg.pose.orientation.z, msg.pose.orientation.w]
+                timestamp = int(msg.header.stamp.sec * 1e9 + msg.header.stamp.nanosec)
+            elif connection.msgtype.endswith("Pose"):
+                position = [msg.position.x, msg.position.y, msg.position.z]
+                orientation = [msg.orientation.x, msg.orientation.y, msg.orientation.z, msg.orientation.w]
+                timestamp = ros_time
+            else:
+                continue
+
             if euler:
                 orientation = Rotation.from_quat(orientation).as_euler("xyz", degrees=False)
 
             pose_data.append(
                 [
-                    int(msg.header.stamp.sec * 1e9 + msg.header.stamp.nanosec),
+                    timestamp,
                     ros_time,
                     *position,
                     *orientation
