@@ -1,7 +1,9 @@
 import cv2
 import numpy as np
+import pypylon.pylon as pylon
 from dataclasses import dataclass
 from glymur import Jp2k
+from tqdm import tqdm
 
 from src.base_extractor import FolderExtractor
 from src.utils import extract_timestamp
@@ -65,6 +67,8 @@ ENCODINGS = {
     "bayer_grbg16": (np.uint16, 1),
 }
 
+FALLBACK_IMAGE_SIZE = (1200, 1920, 1)
+
 
 class ImageExtractor(FolderExtractor):
     
@@ -73,6 +77,8 @@ class ImageExtractor(FolderExtractor):
         self.data_type = "images"
         self.ext = self.args.get("extension", "png")
         self.quality_factor = self.args.get("quality_factor", 1.0)
+        self.basler_decompress = self.args.get("basler_decompress", False)
+        self.convert_12to8bits = self.args.get("convert_12to8bits", False)
         self.debayer = self.args.get("debayer", False)
         self.rectify = self.args.get("rectify", False)
         self.scale = self.args.get("scale", 1.0)
@@ -82,15 +88,21 @@ class ImageExtractor(FolderExtractor):
         self.calib = self._get_camera_info(reader)
         self._save_camera_calibration(self.calib)
     
+    def _post_extract(self, reader):
+        if self.args.get("brackets"):
+            self._sort_bracket_images(reader)
+    
     def _process_message(self, msg, ros_time, msgtype):
         timestamp = extract_timestamp(msg)
-        np_image = self._image_to_numpy(msg)
+        np_image = self._decompress_image(msg) if self.basler_decompress else self._image_to_numpy(msg)
         encoding = getattr(msg, 'encoding', None)
         np_image = self._apply_transformations(np_image, encoding)
         self._save_image(np_image, timestamp)
         return True
     
     def _apply_transformations(self, image, encoding):
+        if self.convert_12to8bits and image.dtype == np.uint16:
+            image = (image / 16).astype(np.uint8)
         if self.debayer and encoding and "bayer" in encoding:
             image = cv2.cvtColor(image, cv2.COLOR_BayerRG2RGB)
         if self.rectify:
@@ -174,3 +186,34 @@ class ImageExtractor(FolderExtractor):
         if channels == 1:
             data = data[..., 0]
         return data
+    
+    def _sort_bracket_images(self, reader):
+        topic_base = self.topic_name.replace("/compressed", "")
+        metadata_topic = "/".join(topic_base.split("/")[:-1] + ["metadata"])
+        brackets = np.array(self.args["brackets"])
+
+        for bracketing_value in brackets:
+            (self.save_folder / f"{bracketing_value:.1f}").mkdir(exist_ok=True)
+
+        print(f'Sorting images from folder "{self.save_folder}"')
+        connections = [x for x in reader.connections if x.topic == metadata_topic]
+        for connection, _, rawdata in tqdm(list(reader.messages(connections=connections))):
+            msg = reader.deserialize(rawdata, connection.msgtype)
+            timestamp = extract_timestamp(msg)
+            bracketing_value = brackets[(np.abs(brackets - msg.ExposureTime)).argmin()]
+            image_path = self.save_folder / f"{int(timestamp):d}.{self.ext}"
+            if image_path.exists():
+                image_path.rename(self.save_folder / f"{bracketing_value:.1f}" / image_path.name)
+
+        print(f"Done ! Sorted images to {self.save_folder}")
+    
+    def _decompress_image(self, img_msg):
+        decompressor = pylon.ImageDecompressor()
+        decompressor.SetCompressionDescriptor(bytes(img_msg.descriptor))
+        try:
+            image = decompressor.DecompressImage(bytes(img_msg.imgBuffer))
+        except Exception as e:
+            print(f"Warning: Failed to decompress image - {e}")
+            return np.zeros(FALLBACK_IMAGE_SIZE, dtype=np.uint16)
+
+        return image.Array
