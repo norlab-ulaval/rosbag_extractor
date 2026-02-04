@@ -1,63 +1,29 @@
-from pathlib import Path
-
-import pandas as pd
-from rosbags.highlevel import AnyReader
-from tqdm import tqdm
-from scipy.spatial.transform import Rotation
+from src.base_extractor import CSVExtractor
+from src.utils import extract_pose, extract_timestamp
 
 
-def extract_pose_from_rosbag(bag_file, topic_name, save_folder, args, overwrite=False):
-
-    euler = args.get("euler", False)
-
-    pose_data = []
-
-    # Avoid overwriting existing files
-    output_file = Path(save_folder) / (Path(save_folder).name + ".csv")
-    if not overwrite and Path(output_file).exists():
-        print(f"Output file {output_file} already exists. Skipping...")
-        return
-
-    with AnyReader([Path(bag_file)]) as reader:
-        # iterate over messages
-        print(f"Extracting pose data from topic \"{topic_name}\" to file \"{output_file.name}\"")
-        connections = [x for x in reader.connections if x.topic == topic_name]
-        messages = list(reader.messages(connections=connections))
-
-        for connection, ros_time, rawdata in tqdm(messages):
-            msg = reader.deserialize(rawdata, connection.msgtype)
-
-            if connection.msgtype.endswith("PoseStamped"):
-                position = [msg.pose.position.x, msg.pose.position.y, msg.pose.position.z]
-                orientation = [msg.pose.orientation.x, msg.pose.orientation.y, msg.pose.orientation.z, msg.pose.orientation.w]
-                timestamp = int(msg.header.stamp.sec * 1e9 + msg.header.stamp.nanosec)
-            elif connection.msgtype.endswith("Pose"):
-                position = [msg.position.x, msg.position.y, msg.position.z]
-                orientation = [msg.orientation.x, msg.orientation.y, msg.orientation.z, msg.orientation.w]
-                timestamp = ros_time
-            else:
-                continue
-
-            if euler:
-                orientation = Rotation.from_quat(orientation).as_euler("xyz", degrees=False)
-
-            pose_data.append(
-                [
-                    timestamp,
-                    ros_time,
-                    *position,
-                    *orientation
-                ]
-            )
-
-        # Define the columns for the DataFrame
-        columns = ["timestamp", "ros_time", "x", "y", "z"]
-        columns += ["roll", "pitch", "yaw"] if euler else ["qx", "qy", "qz", "qw"]
-
-        pose_df = pd.DataFrame(
-            pose_data,
-            columns=columns
-        )
-        pose_df.to_csv(output_file, index=False)
-
-    print(f"Done ! Exported pose data to {output_file}")
+class PoseExtractor(CSVExtractor):
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.data_type = "pose"
+    
+    def _process_message(self, msg, ros_time, msgtype):
+        euler = self.args.get("euler", False)
+        
+        if msgtype.endswith("PoseStamped"):
+            pose_msg = msg.pose
+            timestamp = extract_timestamp(msg)
+        elif msgtype.endswith("Pose"):
+            pose_msg = msg
+            timestamp = ros_time
+        else:
+            return None
+        
+        result = {
+            "timestamp": timestamp,
+            "ros_time": ros_time,
+        }
+        result.update(extract_pose(pose_msg, euler=euler))
+        
+        return result
