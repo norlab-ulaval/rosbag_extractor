@@ -61,6 +61,8 @@ The following types are currently implemented in the tool:
 
 **image** -> Messages of type `sensor_msgs/msg/Image` or `sensor_msgs/msg/CompressedImage`, that will be directly decoded and saved as single images named by timestamps.
 
+**anymal_state** -> ANYmal robot state messages containing odometry, joint states, and contact information.
+
 **tf** -> Extract TF transforms from `/tf` and `/tf_static` topics between a base frame and multiple target frames to CSV files.
 
 
@@ -76,6 +78,14 @@ Image extraction includes these parameters:
 | debayer        | bool      | Whether to convert the bayer image to RGB before saving                                 |
 | gray_scale     | bool      | Whether to convert images to grayscale before saving                                    |
 | quality_factor | float     | Compress extracted images to reduce size on disk (use with JPEG2000), needs to be 1.0 or lower |
+
+
+## ANYmal State
+
+ANYmal state extraction produces three CSV files:
+- **anymal_odom.csv** - Position, orientation (Euler angles), linear and angular velocity
+- **anymal_joints.csv** - Joint position, velocity, acceleration, and effort for each joint
+- **anymal_contacts.csv** - Contact state, position, and force for each foot
 
 
 ## TF Transforms

@@ -1,0 +1,24 @@
+- type: image
+  topic: /boxi/alphasense/front_center/image_raw/compressed
+  folder: front_center_camera
+  args:
+    extension: png
+    rectify: true
+
+- type: tf
+  topic: /tf
+  folder: transforms
+  args:
+    base_frame: odom
+    target_frames:
+      - LF_FOOT
+      - RF_FOOT
+      - LH_FOOT
+      - RH_FOOT
+      - alphasense_front_center
+    euler: true
+    sample_rate: 100.0
+
+- type: anymal_state
+  topic: /anymal/state_estimator/anymal_state
+  folder: state
