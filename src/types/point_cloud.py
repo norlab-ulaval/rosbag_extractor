@@ -1,44 +1,39 @@
-import os
-from pathlib import Path
-
 import numpy as np
 import pandas as pd
-from rosbags.highlevel import AnyReader
-from tqdm import tqdm
+
+from src.base_extractor import FolderExtractor
+from src.utils import extract_timestamp
 
 DATA_TYPES = {
-    1: np.int8,
-    2: np.uint8,
-    3: np.int16,
+    1: np.int8, 
+    2: np.uint8, 
+    3: np.int16, 
     4: np.uint16,
-    5: np.int32,
-    6: np.uint32,
-    7: np.float32,
+    5: np.int32, 
+    6: np.uint32, 
+    7: np.float32, 
     8: np.float64,
 }
 
 
-def extract_point_clouds_from_rosbag(bag_file, topic_name, save_folder, args, overwrite=False):
-
-    # Avoid overwriting existing files
-    if not overwrite and Path(save_folder).exists() and any(Path(save_folder).iterdir()):
-        print(f"Output folder {save_folder} already exists and not empty. Skipping...")
-        return
-
-    with AnyReader([Path(bag_file)]) as reader:
-        print(f"Extracting point clouds from topic \"{topic_name}\" to folder \"{save_folder.split('/')[-1]}\"")
-        connections = [x for x in reader.connections if x.topic == topic_name]
-        messages = list(reader.messages(connections=connections))
+class PointCloudExtractor(FolderExtractor):
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.data_type = "point_clouds"
+    
+    def _process_message(self, msg, ros_time, msgtype):
+        timestamp = extract_timestamp(msg)
+        df = pd.DataFrame()
+        data = np.frombuffer(msg.data, dtype=np.uint8).reshape(-1, msg.point_step)
         
-        for connection, _, rawdata in tqdm(messages):
-            msg = reader.deserialize(rawdata, connection.msgtype)
-            timestamp = msg.header.stamp.sec * 1e9 + msg.header.stamp.nanosec
-            df = pd.DataFrame()
-            data = np.frombuffer(msg.data, dtype=np.uint8).reshape(-1, msg.point_step)
-            for field in msg.fields:
-                type = DATA_TYPES[field.datatype]
-                n_bytes = np.dtype(type).itemsize
-                df[field.name] = data[:, field.offset : field.offset + n_bytes].flatten().view(dtype=type)
-            df.to_csv(os.path.join(save_folder, f"{int(timestamp):d}.csv"), index=False)
-
-    print(f"Done! Extracted point clouds to {save_folder}")
+        for field in msg.fields:
+            if field.datatype not in DATA_TYPES:
+                raise ValueError(f"Unknown point cloud field datatype: {field.datatype}")
+            dtype = DATA_TYPES[field.datatype]
+            n_bytes = np.dtype(dtype).itemsize
+            df[field.name] = data[:, field.offset : field.offset + n_bytes].flatten().view(dtype=dtype)
+        
+        output_file = self.save_folder / f"{int(timestamp):d}.csv"
+        df.to_csv(output_file, index=False)
+        return True

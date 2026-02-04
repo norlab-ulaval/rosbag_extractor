@@ -1,12 +1,20 @@
-import os
-from pathlib import Path
-
 import cv2
 import numpy as np
-import pypylon.pylon as pylon
+from dataclasses import dataclass
 from glymur import Jp2k
-from rosbags.highlevel import AnyReader
-from tqdm import tqdm
+
+from src.base_extractor import FolderExtractor
+from src.utils import extract_timestamp
+
+@dataclass
+class CameraCalibration:
+    K: np.ndarray
+    D: np.ndarray
+    P: np.ndarray
+    R: np.ndarray
+    dist: str
+    width: int
+    height: int
 
 ENCODINGS = {
     "rgb8": (np.uint8, 3),
@@ -19,6 +27,34 @@ ENCODINGS = {
     "bgra16": (np.uint16, 4),
     "mono8": (np.uint8, 1),
     "mono16": (np.uint16, 1),
+    "8UC1": (np.uint8, 1),
+    "8UC2": (np.uint8, 2),
+    "8UC3": (np.uint8, 3),
+    "8UC4": (np.uint8, 4),
+    "8SC1": (np.int8, 1),
+    "8SC2": (np.int8, 2),
+    "8SC3": (np.int8, 3),
+    "8SC4": (np.int8, 4),
+    "16UC1": (np.uint16, 1),
+    "16UC2": (np.uint16, 2),
+    "16UC3": (np.uint16, 3),
+    "16UC4": (np.uint16, 4),
+    "16SC1": (np.int16, 1),
+    "16SC2": (np.int16, 2),
+    "16SC3": (np.int16, 3),
+    "16SC4": (np.int16, 4),
+    "32SC1": (np.int32, 1),
+    "32SC2": (np.int32, 2),
+    "32SC3": (np.int32, 3),
+    "32SC4": (np.int32, 4),
+    "32FC1": (np.float32, 1),
+    "32FC2": (np.float32, 2),
+    "32FC3": (np.float32, 3),
+    "32FC4": (np.float32, 4),
+    "64FC1": (np.float64, 1),
+    "64FC2": (np.float64, 2),
+    "64FC3": (np.float64, 3),
+    "64FC4": (np.float64, 4),
     "bayer_rggb8": (np.uint8, 1),
     "bayer_bggr8": (np.uint8, 1),
     "bayer_gbrg8": (np.uint8, 1),
@@ -30,213 +66,111 @@ ENCODINGS = {
 }
 
 
-def extract_images_from_rosbag(bag_file, topic_name, save_folder, args, overwrite):
-
-    ext = args.get("extension", "png")
-    quality_factor = args.get("quality_factor", 1.0)
-    basler_decompress = args.get("basler_decompress", False)
-    convert_12to8bits = args.get("convert_12to8bits", False)
-    debayer = args.get("debayer", False)
-    rectify = args.get("rectify", False)
-    scale = args.get("scale", 1.0)
-    gray_scale = args.get("gray_scale", False)
-
-    # Avoid overwriting existing files
-    if not overwrite and Path(save_folder).exists() and any(Path(save_folder).iterdir()):
-        print(f"Output folder {save_folder} already exists and not empty. Skipping...")
-        return
-
-    with AnyReader([Path(bag_file)]) as reader:
-        # Save camera calibration if available
-        save_camera_calibration(reader, topic_name, save_folder)
-        
-        if rectify:
-            K, D, distortion_model = get_camera_calibration_matrix(reader, topic_name)
-
-        # iterate over messages
-        print(f"Extracting images from topic \"{topic_name}\" to folder \"{save_folder.split('/')[-1]}\"")
-        connections = [x for x in reader.connections if x.topic == topic_name]
-        messages = list(reader.messages(connections=connections))
-        
-        for connection, _, rawdata in tqdm(messages):
-            msg = reader.deserialize(rawdata, connection.msgtype)
-            timestamp = msg.header.stamp.sec * 1e9 + msg.header.stamp.nanosec
-
-            if basler_decompress:
-                np_image = decompress_image(msg)
+class ImageExtractor(FolderExtractor):
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.data_type = "images"
+        self.ext = self.args.get("extension", "png")
+        self.quality_factor = self.args.get("quality_factor", 1.0)
+        self.debayer = self.args.get("debayer", False)
+        self.rectify = self.args.get("rectify", False)
+        self.scale = self.args.get("scale", 1.0)
+        self.gray_scale = self.args.get("gray_scale", False)
+    
+    def _pre_extract(self, reader):
+        self.calib = self._get_camera_info(reader)
+        self._save_camera_calibration(self.calib)
+    
+    def _process_message(self, msg, ros_time, msgtype):
+        timestamp = extract_timestamp(msg)
+        np_image = self._image_to_numpy(msg)
+        encoding = getattr(msg, 'encoding', None)
+        np_image = self._apply_transformations(np_image, encoding)
+        self._save_image(np_image, timestamp)
+        return True
+    
+    def _apply_transformations(self, image, encoding):
+        if self.debayer and encoding and "bayer" in encoding:
+            image = cv2.cvtColor(image, cv2.COLOR_BayerRG2RGB)
+        if self.rectify:
+            if self.calib.dist in ["equidistant", "fisheye"]:
+                image = cv2.fisheye.undistortImage(image, self.calib.K, self.calib.D, Knew=self.calib.K)
             else:
-                np_image = image_to_numpy(msg)
-
-            if convert_12to8bits and np_image.dtype == np.uint16:
-                np_image = (np_image / 16).astype(np.uint8)
-            if debayer and "bayer" in msg.encoding:
-                np_image = cv2.cvtColor(np_image, cv2.COLOR_BayerRG2RGB)
-            if rectify:
-                if distortion_model in ["equidistant", "fisheye"]:
-                    np_image = cv2.fisheye.undistortImage(np_image, K, D, Knew=K)
-                else:
-                    np_image = cv2.undistort(np_image, K, D)
-            if scale != 1.0:
-                np_image = cv2.resize(np_image, (0, 0), fx=scale, fy=scale)
-            if gray_scale and len(np_image.shape) == 3:
-                np_image = cv2.cvtColor(np_image, cv2.COLOR_BGR2GRAY)
-
-            # Save image
-            if quality_factor < 1.0 and ext.lower() == "jpg":
-                Jp2k(
-                    os.path.join(save_folder, f"{int(timestamp):d}.{ext}"),
-                    data=np_image,
-                    cratios=[quality_factor],
-                )
-            else:
-                cv2.imwrite(os.path.join(save_folder, f"{int(timestamp):d}.{ext}"), np_image)
-
-    if "brackets" in args:
-        sort_bracket_images(bag_file, topic_name, save_folder, ext, args)
-
-    print(f"Done! Extracted images to {save_folder}")
-
-def save_camera_calibration(reader, topic_name, output_folder):
-    """Save camera calibration in OpenCV YAML format."""
-
-    topic_base = topic_name.replace("/compressed", "")
-    camera_info_topic = "/".join(topic_base.split("/")[:-1] + ["camera_info"])
-    connections = [x for x in reader.connections if x.topic == camera_info_topic]
-
-    if not connections:
-        return
-
-    for connection, _, rawdata in reader.messages(connections=connections):
-        camera_info = reader.deserialize(rawdata, connection.msgtype)
+                image = cv2.undistort(image, self.calib.K, self.calib.D)
+        if self.scale != 1.0:
+            image = cv2.resize(image, (0, 0), fx=self.scale, fy=self.scale)
+        if self.gray_scale and len(image.shape) == 3:
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        return image
+    
+    def _save_image(self, image, timestamp):
+        output_file = self.save_folder / f"{int(timestamp):d}.{self.ext}"
+        if self.quality_factor < 1.0 and self.ext.lower() == "jpg":
+            Jp2k(str(output_file), data=image, cratios=[self.quality_factor])
+        else:
+            cv2.imwrite(str(output_file), image)
+    
+    def _save_camera_calibration(self, calib):
+        if calib is None or calib.K is None:
+            return
         
-        # Extract calibration data
-        try:
-            K = np.array(camera_info.k).reshape([3, 3])
-            D = np.array(camera_info.d)
-            P = np.array(camera_info.p).reshape([3, 4])
-            R = np.array(camera_info.r).reshape([3, 3])
-        except:
-            K = np.array(camera_info.K).reshape([3, 3])
-            D = np.array(camera_info.D)
-            P = np.array(camera_info.P).reshape([3, 4])
-            R = np.array(camera_info.R).reshape([3, 3])
+        calibration_file = self.save_folder / "camera_calibration.yaml"
         
-        distortion_model = getattr(camera_info, 'distortion_model', 'plumb_bob')
-        width = camera_info.width
-        height = camera_info.height
-        
-        # Save in OpenCV YAML format
-        calibration_file = os.path.join(output_folder, "camera_calibration.yaml")
-        
-        fs = cv2.FileStorage(calibration_file, cv2.FILE_STORAGE_WRITE)
-        fs.write("image_width", int(width))
-        fs.write("image_height", int(height))
-        fs.write("camera_matrix", K)
-        fs.write("distortion_model", distortion_model)
-        fs.write("distortion_coefficients", D)
-        fs.write("rectification_matrix", R)
-        fs.write("projection_matrix", P)
+        fs = cv2.FileStorage(str(calibration_file), cv2.FILE_STORAGE_WRITE)
+        fs.write("image_width", int(calib.width))
+        fs.write("image_height", int(calib.height))
+        fs.write("camera_matrix", calib.K)
+        fs.write("distortion_model", calib.dist)
+        fs.write("distortion_coefficients", calib.D)
+        fs.write("rectification_matrix", calib.R)
+        fs.write("projection_matrix", calib.P)
         fs.release()
         
         print(f"Saved camera calibration to {calibration_file}")
-        break
-
-def get_camera_calibration_matrix(reader, topic_name):
-    """Extract camera calibration matrix and distortion model from rosbag."""
-
-
-    topic_base = topic_name.replace("/compressed", "")
-    camera_info_topic = "/".join(topic_base.split("/")[:-1] + ["camera_info"])
-    connections = [x for x in reader.connections if x.topic == camera_info_topic]
-
-    if not connections:
-        raise ValueError(f"Camera info topic {camera_info_topic} not found in rosbag.")
-
-    for connection, _, rawdata in reader.messages(connections=connections):
-        camera_info = reader.deserialize(rawdata, connection.msgtype)
-        try:
-            K = np.array(camera_info.k).reshape([3, 3])
-            D = np.array(camera_info.d)
-        except:
-            K = np.array(camera_info.K).reshape([3, 3])
-            D = np.array(camera_info.D)
-        
-        # Extract distortion model (default to plumb_bob if not specified)
-        distortion_model = getattr(camera_info, 'distortion_model', 'plumb_bob')
-        break
-
-    return K, D, distortion_model
-
-
-def image_to_numpy(msg):
-    """
-    Convert ROS Image or CompressedImage message to numpy array.
-    Handles both sensor_msgs/Image and sensor_msgs/CompressedImage.
-    """
-    # Check if it's a CompressedImage
-    if hasattr(msg, 'format'):
-        # CompressedImage - decode using OpenCV
-        np_arr = np.frombuffer(msg.data, np.uint8)
-        image = cv2.imdecode(np_arr, cv2.IMREAD_UNCHANGED)
-        if image is None:
-            raise ValueError(f"Failed to decode compressed image with format: {msg.format}")
-        return image
     
-    # Regular Image message
-    # Taken from https://github.com/eric-wieser/ros_numpy
+    def _get_camera_info(self, reader):
+        topic_base = self.topic_name.replace("/compressed", "")
+        camera_info_topic = "/".join(topic_base.split("/")[:-1] + ["camera_info"])
+        connections = [x for x in reader.connections if x.topic == camera_info_topic]
 
-    if not msg.encoding in ENCODINGS:
-        raise TypeError("Unrecognized encoding {}".format(msg.encoding))
+        if not connections:
+            if self.rectify:
+                raise ValueError(f"Camera info topic not found for {self.topic_name}")
+            return None
 
-    dtype_class, channels = ENCODINGS[msg.encoding]
-    dtype = np.dtype(dtype_class)
-    dtype = dtype.newbyteorder(">" if msg.is_bigendian else "<")
-    shape = (msg.height, msg.width, channels)
+        connection, _, rawdata = next(reader.messages(connections=connections))
+        camera_info = reader.deserialize(rawdata, connection.msgtype)
+        
+        K = np.array(camera_info.k if hasattr(camera_info, 'k') else camera_info.K).reshape([3, 3])
+        D = np.array(camera_info.d if hasattr(camera_info, 'd') else camera_info.D)
+        P = np.array(camera_info.p if hasattr(camera_info, 'p') else camera_info.P).reshape([3, 4])
+        R = np.array(camera_info.r if hasattr(camera_info, 'r') else camera_info.R).reshape([3, 3])
+        dist = getattr(camera_info, 'distortion_model', 'plumb_bob')
+        
+        return CameraCalibration(K, D, P, R, dist, camera_info.width, camera_info.height)
+    
+    def _image_to_numpy(self, msg):
+        if hasattr(msg, 'format'):
+            np_arr = np.frombuffer(msg.data, np.uint8)
+            image = cv2.imdecode(np_arr, cv2.IMREAD_UNCHANGED)
+            if image is None:
+                raise ValueError(f"Failed to decode compressed image with format: {msg.format}")
+            return image
+        
+        if msg.encoding not in ENCODINGS:
+            raise ValueError(f"Unrecognized encoding: {msg.encoding}")
 
-    data = np.frombuffer(msg.data, dtype=dtype).reshape(shape)
-    data.strides = (msg.step, dtype.itemsize * channels, dtype.itemsize)
+        dtype_class, channels = ENCODINGS[msg.encoding]
+        dtype = np.dtype(dtype_class)
+        dtype = dtype.newbyteorder(">" if msg.is_bigendian else "<")
+        shape = (msg.height, msg.width, channels)
 
-    if "rgb" in msg.encoding:
-        data = cv2.cvtColor(data, cv2.COLOR_RGB2BGR)
-    if channels == 1:
-        data = data[..., 0]
-    return data
+        data = np.frombuffer(msg.data, dtype=dtype).reshape(shape)
+        data.strides = (msg.step, dtype.itemsize * channels, dtype.itemsize)
 
-
-def sort_bracket_images(bag_file, image_topic, images_folder, image_ext, args):
-
-    metadata_topic = "/".join(image_topic.split("/")[:-1] + ["metadata"])
-    brackets = np.array(args["brackets"])
-
-    for bracketing_value in brackets:
-        os.mkdir(os.path.join(images_folder, f"{bracketing_value:.1f}"))
-
-    with AnyReader([Path(bag_file)]) as reader:
-        # iterate over messages
-        print(f'Sorting images from folder "{images_folder}"')
-        connections = [x for x in reader.connections if x.topic == metadata_topic]
-        messages = list(reader.messages(connections=connections))
-        for connection, _, rawdata in tqdm(messages):
-            msg = reader.deserialize(rawdata, connection.msgtype)
-            timestamp = msg.header.stamp.sec * 1e9 + msg.header.stamp.nanosec
-            idx = (np.abs(brackets - msg.ExposureTime)).argmin()
-            bracketing_value = brackets[idx]
-            image_name = f"{int(timestamp):d}.{image_ext}"
-            image_path = Path(images_folder, image_name)
-            if os.path.exists(image_path):
-                os.rename(image_path, os.path.join(images_folder, f"{bracketing_value:.1f}", image_name))
-
-    print(f"Done ! Sorted images to {images_folder}")
-
-
-def decompress_image(img_msg):
-    # Decompressing the image
-    decompressor = pylon.ImageDecompressor()
-    decompressor.SetCompressionDescriptor(bytes(img_msg.descriptor))
-    try:
-        image = decompressor.DecompressImage(bytes(img_msg.imgBuffer))
-    except Exception as e:
-        print(f"Lost an image due to compression issue.")
-        return np.zeros((1200, 1920, 1), dtype=np.uint16)
-
-    return image.Array
+        if "rgb" in msg.encoding:
+            data = cv2.cvtColor(data, cv2.COLOR_RGB2BGR)
+        if channels == 1:
+            data = data[..., 0]
+        return data
