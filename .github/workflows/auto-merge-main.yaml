@@ -1,0 +1,26 @@
+name: Auto-merge main into feature branches
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  merge-main:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        branch: [anymal, backpack, mtt]
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Merge main into ${{ matrix.branch }}
+        run: |
+          git config user.email "bot@github.com"
+          git config user.name "GitHub Actions"
+          git checkout ${{ matrix.branch }}
+          git merge origin/main --no-edit
+          git push origin ${{ matrix.branch }}
