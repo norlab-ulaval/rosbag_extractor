@@ -1,0 +1,3 @@
+- type: mtt_tachometer
+  topic: /mtt_tachometer
+  folder: mtt_tachometer

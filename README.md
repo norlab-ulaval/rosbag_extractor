@@ -66,6 +66,11 @@ The following types are currently implemented in the tool:
 **tf** -> Extract TF transforms from `/tf` and `/tf_static` topics between a base frame and multiple target frames to CSV files.
 
 
+## Branch-specific types
+
+**mtt_tachometer** -> MTT custom message containing vehicle velocity and steering.
+
+
 ## Images
 
 Image extraction includes these parameters:

@@ -18,6 +18,7 @@ from src.types.pose import PoseExtractor
 from src.types.point_cloud import PointCloudExtractor
 from src.types.tf import TFExtractor
 from src.types.twist import TwistExtractor
+from src.types.mtt_tachometer import MttTachometerExtractor
 
 
 EXTRACTORS = {
@@ -31,6 +32,7 @@ EXTRACTORS = {
     "basic": BasicExtractor,
     "audio": AudioExtractor,
     "tf": TFExtractor,
+    "mtt_tachometer": MttTachometerExtractor,
 }
 
 
