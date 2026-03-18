@@ -57,6 +57,8 @@ The following types are currently implemented in the tool:
 
 **pose** -> Messages of type `geometry_msgs/msg/Pose` or `geometry_msgs/msg/PoseStamped`, can be extracted to a single CSV file including timestamps.
 
+**twist** -> Messages of type `geometry_msgs/msg/Twist` or `geometry_msgs/msg/TwistStamped`, can be extracted to a single CSV file including timestamps.
+
 **point_cloud** -> Messages of type `sensor_msgs/msg/PointCloud2`, can be extracted to a single CSV file per point cloud, named by timestamp.
 
 **image** -> Messages of type `sensor_msgs/msg/Image` or `sensor_msgs/msg/CompressedImage`, that will be directly decoded and saved as single images named by timestamps.
