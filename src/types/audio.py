@@ -54,6 +54,3 @@ class AudioExtractor(CSVExtractor):
         else:
             print(f"Unsupported output file format: {self.output_file}")
             return
-    
-    def _log_complete(self):
-        print(f"Done! Exported audio data to {self.output_file}")
