@@ -24,11 +24,11 @@ class BaseExtractor(ABC):
             print(f"Warning: No messages found for topic {self.topic_name}")
             return
         
-        messages = list(reader.messages(connections=connections))
+        # messages = list(reader.messages(connections=connections))
         self._log_start()
         
         data = []
-        for connection, ros_time, rawdata in tqdm(messages):
+        for connection, ros_time, rawdata in tqdm(reader.messages(connections=connections)):
             msg = reader.deserialize(rawdata, connection.msgtype)
             row_data = self._process_message(msg, ros_time, connection.msgtype)
             if row_data is not None:
