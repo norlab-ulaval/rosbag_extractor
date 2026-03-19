@@ -12,6 +12,7 @@ class BaseExtractor(ABC):
         self.save_folder = Path(save_folder)
         self.args = args
         self.overwrite = overwrite
+        self.message_count = 0
         
     def extract(self, reader):
         if not self._check_overwrite():
@@ -24,11 +25,11 @@ class BaseExtractor(ABC):
             print(f"Warning: No messages found for topic {self.topic_name}")
             return
         
-        # messages = list(reader.messages(connections=connections))
+        message_count = sum(getattr(connection, "msgcount", 0) for connection in connections)
         self._log_start()
         
         data = []
-        for connection, ros_time, rawdata in tqdm(reader.messages(connections=connections)):
+        for connection, ros_time, rawdata in tqdm(reader.messages(connections=connections), total=message_count):
             msg = reader.deserialize(rawdata, connection.msgtype)
             row_data = self._process_message(msg, ros_time, connection.msgtype)
             if row_data is not None:
