@@ -46,7 +46,7 @@ class AnymalStateExtractor(FolderExtractor):
         
         return True
     
-    def _post_extract(self, reader):
+    def _save_data(self, data):
         pd.DataFrame(self.odom_data).to_csv(
             self.save_folder / "anymal_odom.csv", index=False
         )
