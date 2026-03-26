@@ -5,6 +5,6 @@ packaging
 pandas
 pillow
 PyYaml
-rosbags>=0.10
+rosbags>=0.10.3
 scipy
 tqdm
