@@ -1,0 +1,67 @@
+- type: odometry
+  topic: /mapping/icp_odom
+  folder: icp_odom
+  args:
+    euler: true
+
+- type: odometry
+  topic: /husky_motor_controller/odom
+  folder: wheel_odom
+  args:
+    euler: false
+
+- type: odometry
+  topic: /mapping/icp_odom
+  folder: icp_odom
+  args:
+    euler: false
+
+- type: twist
+  topic: /mti100/velocity
+  folder: imu_odom
+
+- type: imu
+  topic: /mti100/data
+  folder: imu
+  args:
+    euler: false
+
+- type: point_cloud
+  topic: /rslidar32/points
+  folder: navigation_lidar
+
+- type: point_cloud
+  topic: /rsairy_ns/points
+  folder: dome_lidar
+
+- type: pose
+  topic: /mapping/pose
+  folder: mapping_pose
+  args:
+    euler: false
+
+- type: twist
+  topic: /teleop/cmd_vel
+  folder: teleop_cmd_vel
+
+- type: twist
+  topic: /controller/cmd_vel
+  folder: sinkage_cmd_vel
+
+- type: twist
+  topic: /husky_motor_controller/cmd_vel_out
+  folder: husky_cmd_vel_out
+
+- type: twist
+  topic: /husky_motor_controller/cmd_vel
+  folder: husky_cmd_vel_in
+
+- type: husky_status
+  topic: /status
+  folder: husky_status
+
+- type: joint_states
+  topic: /joint_states
+  folder: wheel_encoder
+
+

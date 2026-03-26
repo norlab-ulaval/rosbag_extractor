@@ -18,8 +18,8 @@ from src.types.pose import PoseExtractor
 from src.types.point_cloud import PointCloudExtractor
 from src.types.tf import TFExtractor
 from src.types.twist import TwistExtractor
-
-
+from src.types.husky_status import HuskyStateExtractor
+from src.types.joint_states import JointStates
 EXTRACTORS = {
     "pose": PoseExtractor,
     "twist": TwistExtractor,
@@ -31,6 +31,8 @@ EXTRACTORS = {
     "basic": BasicExtractor,
     "audio": AudioExtractor,
     "tf": TFExtractor,
+    "husky_status":HuskyStateExtractor,
+    "joint_states": JointStates
 }
 
 
