@@ -9,7 +9,6 @@ class TwistExtractor(CSVExtractor):
         self.data_type = "twist"
     
     def _process_message(self, msg, ros_time, msgtype):
-        euler = self.args.get("euler", False)
         
         if msgtype.endswith("TwistStamped"):
             twist_msg = msg.twist
@@ -24,6 +23,6 @@ class TwistExtractor(CSVExtractor):
             "timestamp": timestamp,
             "ros_time": ros_time,
         }
-        result.update(extract_twist(twist_msg, euler=euler))
+        result.update(extract_twist(twist_msg))
         
         return result
