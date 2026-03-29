@@ -60,7 +60,7 @@ class TFExtractor(FolderExtractor):
         
         return None
     
-    def _post_extract(self, reader):
+    def _save_data(self, data):
         safe_base = self.base_frame.replace('/', '_').lower()
         columns = ['timestamp', 'x', 'y', 'z', 'roll', 'pitch', 'yaw'] if self.euler else \
                   ['timestamp', 'x', 'y', 'z', 'qx', 'qy', 'qz', 'qw']
@@ -72,10 +72,16 @@ class TFExtractor(FolderExtractor):
                 output_file = self.save_folder / f"{safe_base}_to_{safe_target}.csv"
                 df = pd.DataFrame(transform_data, columns=columns)
                 df.to_csv(output_file, index=False)
+            else:
+                print(f"No transforms found for target frame '{target_frame}' relative to base frame '{self.base_frame}'.")
     
     def _load_static_transforms(self, reader):
         print("Reading static transforms...", end="", flush=True)
         static_connections = [x for x in reader.connections if x.topic == '/tf_static']
+        
+        if not static_connections:
+            print(" None found, skipping.")
+            return
         
         for connection, ros_time, rawdata in reader.messages(connections=static_connections):
             msg = reader.deserialize(rawdata, connection.msgtype)
