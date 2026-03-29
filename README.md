@@ -72,14 +72,15 @@ The following types are currently implemented in the tool:
 
 Image extraction includes these parameters:
 
-| Args           | Type      | Description                                                                             |
-| -------------- | --------- | --------------------------------------------------------------------------------------- |
-| extension      | str       | Image file format (e.g., 'png', 'jpg'). Default: 'png'                                  |
-| rectify        | bool      | Whether to rectify the images (will look for <cam_topic>/camera_info). Supports fisheye/equidistant distortion models |
-| scale          | float     | Factor to rescale the images (1.0 will leave them unchanged)                            |
-| debayer        | bool      | Whether to convert the bayer image to RGB before saving                                 |
-| gray_scale     | bool      | Whether to convert images to grayscale before saving                                    |
-| quality_factor | float     | Compress extracted images to reduce size on disk (use with JPEG2000), needs to be 1.0 or lower |
+| Args           | Type      | Default | Description                                                                             |
+| -------------- | --------- | ------- | --------------------------------------------------------------------------------------- |
+| video          | bool      | `false` | Create a video instead of saving individual files (estimating FPS from `ros_time`)      |
+| extension      | str       | `png`   | Image file format (e.g., 'png', 'jpg')                                                  |
+| rectify        | bool      | `false` | Whether to rectify the images (will look for <cam_topic>/camera_info). Supports fisheye/equidistant distortion models |
+| scale          | float     | `1.0`   | Factor to rescale the images (1.0 will leave them unchanged)                            |
+| debayer        | bool      | `false` | Whether to convert the bayer image to RGB before saving                                 |
+| gray_scale     | bool      | `false` | Whether to convert images to grayscale before saving                                    |
+| quality_factor | float     | `1.0`   | Compress extracted images to reduce size on disk (use with JPEG2000), needs to be 1.0 or lower |
 
 
 ## ANYmal State
