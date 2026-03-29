@@ -9,7 +9,7 @@
   topic: /tf
   folder: transforms
   args:
-    base_frame: odom
+    base_frame: dlio_map
     target_frames:
       - LF_FOOT
       - RF_FOOT
