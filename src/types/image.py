@@ -77,18 +77,31 @@ class ImageExtractor(FolderExtractor):
         self.rectify = self.args.get("rectify", False)
         self.scale = self.args.get("scale", 1.0)
         self.gray_scale = self.args.get("gray_scale", False)
+        self.video = self.args.get("video", False)
+        self._video_writer = None
     
     def _pre_extract(self, reader):
         self.calib = self._get_camera_info(reader)
         self._save_camera_calibration(self.calib)
+        if self.video:
+            self._video_fps = self._compute_fps(reader)
+            print(f"Estimated FPS for topic {self.topic_name}: {self._video_fps:.2f}")
     
     def _process_message(self, msg, ros_time, msgtype):
-        timestamp = extract_timestamp(msg)
         np_image = self._image_to_numpy(msg)
         encoding = getattr(msg, 'encoding', None)
         np_image = self._apply_transformations(np_image, encoding)
-        self._save_image(np_image, timestamp)
+        if self.video:
+            self._write_video_frame(np_image)
+        else:
+            timestamp = extract_timestamp(msg)
+            self._save_image(np_image, timestamp)
         return True
+    
+    def _post_extract(self, reader):
+        if self._video_writer is not None:
+            self._video_writer.release()
+            print(f"Saved video to {self._video_file}")
     
     def _apply_transformations(self, image, encoding):
         if self.debayer and encoding and "bayer" in encoding:
@@ -174,3 +187,27 @@ class ImageExtractor(FolderExtractor):
         if channels == 1:
             data = data[..., 0]
         return data
+    
+    def _compute_fps(self, reader):
+        connections = [x for x in reader.connections if x.topic == self.topic_name]
+        timestamps = [ros_time for _, ros_time, _ in reader.messages(connections=connections)]
+        if len(timestamps) > 1:
+            mean_duration = np.diff(timestamps).mean() / 1e9
+            return 1.0 / mean_duration if mean_duration > 0 else 30.0
+        return 30.0
+    
+    def _write_video_frame(self, image):
+        image = self._to_bgr(image)
+        if self._video_writer is None:
+            height, width = image.shape[:2]
+            self._video_file = self.save_folder / f"{self.save_folder.name}.mp4"
+            fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+            self._video_writer = cv2.VideoWriter(str(self._video_file), fourcc, self._video_fps, (width, height))
+        self._video_writer.write(image)
+
+    def _to_bgr(self, image):
+        if len(image.shape) == 2:
+            return cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
+        if image.shape[2] == 4:
+            return cv2.cvtColor(image, cv2.COLOR_BGRA2BGR)
+        return image
