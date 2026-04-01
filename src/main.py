@@ -9,6 +9,7 @@ from rosbags.highlevel import AnyReader
 
 from src.utils import Colors
 from src.types.anymal_state import AnymalStateExtractor
+from src.types.anymal_actuators import AnymalActuatorsExtractor
 from src.types.audio import AudioExtractor
 from src.types.basic import BasicExtractor
 from src.types.gnss import GNSSExtractor
@@ -33,6 +34,7 @@ EXTRACTORS = {
     "audio": AudioExtractor,
     "tf": TFExtractor,
     "anymal_state": AnymalStateExtractor,
+    "anymal_actuators": AnymalActuatorsExtractor,
 }
 
 

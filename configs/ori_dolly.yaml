@@ -1,0 +1,30 @@
+- type: image
+  topic: /depth_camera_front_lower/color/image_raw
+  folder: front_center_camera
+  args:
+    extension: png
+    rectify: true
+    video: true
+
+- type: tf
+  topic: /tf
+  folder: transforms
+  args:
+    base_frame: odom
+    target_frames:
+      - LF_FOOT
+      - RF_FOOT
+      - LH_FOOT
+      - RH_FOOT
+      - base
+      - color_realsense_front_color_optical_frame
+    euler: true
+    sample_rate: 100.0
+
+- type: anymal_state
+  topic: /state_estimator/anymal_state
+  folder: state
+
+- type: anymal_actuators
+  topic: /anymal_low_level_controller/actuator_readings
+  folder: actuators

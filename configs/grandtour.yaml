@@ -4,6 +4,7 @@
   args:
     extension: png
     rectify: true
+    video: true
 
 - type: tf
   topic: /tf
@@ -15,6 +16,7 @@
       - RF_FOOT
       - LH_FOOT
       - RH_FOOT
+      - base
       - alphasense_front_center
     euler: true
     sample_rate: 100.0
@@ -22,3 +24,7 @@
 - type: anymal_state
   topic: /anymal/state_estimator/anymal_state
   folder: state
+
+- type: anymal_actuators
+  topic: /anymal/actuator_readings
+  folder: actuators
