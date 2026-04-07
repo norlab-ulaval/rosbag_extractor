@@ -10,7 +10,22 @@
   topic: /tf
   folder: transforms
   args:
-    base_frame: dlio_map
+    base_frame: odom
+    target_frames:
+      - LF_FOOT
+      - RF_FOOT
+      - LH_FOOT
+      - RH_FOOT
+      - base
+      - alphasense_front_center
+    euler: true
+    sample_rate: 100.0
+
+- type: tf
+  topic: /tf
+  folder: transforms
+  args:
+    base_frame: enu_origin
     target_frames:
       - LF_FOOT
       - RF_FOOT
