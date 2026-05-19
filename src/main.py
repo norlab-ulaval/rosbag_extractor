@@ -35,10 +35,18 @@ EXTRACTORS = {
 
 
 def load_config(name) -> dict:
-    if not name.endswith(".yaml"):
-        name += ".yaml"
-    config_path = os.path.join(os.path.dirname(__file__), "..", "configs", f"{name}")
-    return yaml.safe_load(open(config_path))
+    config_name = name
+    if not config_name.endswith(".yaml"):
+        config_name += ".yaml"
+
+    cwd_path = Path(config_name).expanduser()
+    if cwd_path.exists():
+        with cwd_path.open("r", encoding="utf-8") as handle:
+            return yaml.safe_load(handle)
+
+    config_path = Path(__file__).resolve().parent.parent / "configs" / config_name
+    with config_path.open("r", encoding="utf-8") as handle:
+        return yaml.safe_load(handle)
 
 
 def parse_args():
