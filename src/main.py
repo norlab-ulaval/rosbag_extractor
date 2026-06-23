@@ -15,6 +15,7 @@ from src.types.image import ImageExtractor
 from src.types.imu import IMUExtractor
 from src.types.odom import OdometryExtractor
 from src.types.pose import PoseExtractor
+from src.types.point import PointExtractor
 from src.types.point_cloud import PointCloudExtractor
 from src.types.tf import TFExtractor
 from src.types.twist import TwistExtractor
@@ -22,6 +23,7 @@ from src.types.twist import TwistExtractor
 
 EXTRACTORS = {
     "pose": PoseExtractor,
+    "point": PointExtractor,
     "twist": TwistExtractor,
     "imu": IMUExtractor,
     "odometry": OdometryExtractor,
