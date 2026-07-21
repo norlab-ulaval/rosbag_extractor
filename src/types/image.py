@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import pandas as pd
 from dataclasses import dataclass
 from glymur import Jp2k
 
@@ -79,29 +80,43 @@ class ImageExtractor(FolderExtractor):
         self.gray_scale = self.args.get("gray_scale", False)
         self.video = self.args.get("video", False)
         self._video_writer = None
-    
+        self._video_timestamps = []
+
     def _pre_extract(self, reader):
         self.calib = self._get_camera_info(reader)
         self._save_camera_calibration(self.calib)
         if self.video:
             self._video_fps = self._compute_fps(reader)
             print(f"Estimated FPS for topic {self.topic_name}: {self._video_fps:.2f}")
-    
+
     def _process_message(self, msg, ros_time, msgtype):
         np_image = self._image_to_numpy(msg)
         encoding = getattr(msg, 'encoding', None)
         np_image = self._apply_transformations(np_image, encoding)
+        timestamp = extract_timestamp(msg)
         if self.video:
             self._write_video_frame(np_image)
+            self._video_timestamps.append(timestamp)
         else:
-            timestamp = extract_timestamp(msg)
             self._save_image(np_image, timestamp)
         return True
-    
+
     def _post_extract(self, reader):
         if self._video_writer is not None:
             self._video_writer.release()
             print(f"Saved video to {self._video_file}")
+            self._save_video_timestamps()
+
+    def _save_video_timestamps(self):
+        # cv2.VideoWriter has no variable frame-rate mode: it encodes at
+        # self._video_fps regardless of actual message spacing, so frame
+        # index alone can't recover real timestamps — save them alongside.
+        timestamps_file = self.save_folder / "timestamps.csv"
+        pd.DataFrame({
+            "frame": range(len(self._video_timestamps)),
+            "timestamp": self._video_timestamps,
+        }).to_csv(timestamps_file, index=False)
+        print(f"Saved frame timestamps to {timestamps_file}")
     
     def _apply_transformations(self, image, encoding):
         if self.debayer and encoding and "bayer" in encoding:
