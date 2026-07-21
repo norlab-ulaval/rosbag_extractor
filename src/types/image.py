@@ -159,8 +159,16 @@ class ImageExtractor(FolderExtractor):
     
     def _get_camera_info(self, reader):
         topic_base = self.topic_name.replace("/compressed", "")
-        camera_info_topic = "/".join(topic_base.split("/")[:-1] + ["camera_info"])
+        namespace = "/".join(topic_base.split("/")[:-1])
+        camera_info_topic = f"{namespace}/camera_info"
         connections = [x for x in reader.connections if x.topic == camera_info_topic]
+
+        if not connections:
+            # Handle suffixed variants like camera_info_throttle
+            connections = [
+                x for x in reader.connections
+                if x.topic.startswith(f"{namespace}/camera_info")
+            ]
 
         if not connections:
             if self.rectify:
