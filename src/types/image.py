@@ -108,9 +108,6 @@ class ImageExtractor(FolderExtractor):
             self._save_video_timestamps()
 
     def _save_video_timestamps(self):
-        # cv2.VideoWriter has no variable frame-rate mode: it encodes at
-        # self._video_fps regardless of actual message spacing, so frame
-        # index alone can't recover real timestamps — save them alongside.
         timestamps_file = self.save_folder / "timestamps.csv"
         pd.DataFrame({
             "frame": range(len(self._video_timestamps)),
