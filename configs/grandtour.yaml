@@ -36,6 +36,16 @@
     euler: true
     sample_rate: 100.0
 
+- type: tf
+  topic: /tf
+  folder: transforms_static
+  args:
+    base_frame: base
+    target_frames:
+      - alphasense_front_center
+    euler: true
+    sample_rate: 1.0
+
 - type: anymal_state
   topic: /anymal/state_estimator/anymal_state
   folder: state
