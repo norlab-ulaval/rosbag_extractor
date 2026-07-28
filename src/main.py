@@ -20,6 +20,7 @@ from src.types.pose import PoseExtractor
 from src.types.point import PointExtractor
 from src.types.point_cloud import PointCloudExtractor
 from src.types.tf import TFExtractor
+from src.types.theodolite import TheodoliteExtractor
 from src.types.twist import TwistExtractor
 
 
@@ -35,6 +36,7 @@ EXTRACTORS = {
     "basic": BasicExtractor,
     "audio": AudioExtractor,
     "tf": TFExtractor,
+    "theodolite": TheodoliteExtractor,
     "anymal_state": AnymalStateExtractor,
     "anymal_actuators": AnymalActuatorsExtractor,
 }
