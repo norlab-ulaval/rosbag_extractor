@@ -22,20 +22,5 @@ jobs:
           git config user.email "bot@github.com"
           git config user.name "GitHub Actions"
           git checkout ${{ matrix.branch }}
-          if ! git merge origin/main --no-edit; then
-            if [ "${{ matrix.branch }}" = "backpack" ]; then
-              unresolved_files="$(git diff --name-only --diff-filter=U)"
-              if [ "$unresolved_files" = "src/types/image.py" ]; then
-                git checkout --ours src/types/image.py
-                git add src/types/image.py
-                git commit --no-edit
-              else
-                echo "Unexpected merge conflicts on backpack branch:"
-                echo "$unresolved_files"
-                exit 1
-              fi
-            else
-              exit 1
-            fi
-          fi
+          git merge origin/main --no-edit
           git push origin ${{ matrix.branch }}
