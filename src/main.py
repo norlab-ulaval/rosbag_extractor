@@ -8,6 +8,7 @@ from pathlib import Path
 from rosbags.highlevel import AnyReader
 
 from src.utils import Colors
+from src.typestore import typestore
 from src.types.audio import AudioExtractor
 from src.types.basic import BasicExtractor
 from src.types.gnss import GNSSExtractor
@@ -81,7 +82,7 @@ def extract_data(bag_file, config, output_folder, overwrite=False, ignore_missin
     output_folder = Path(output_folder)
     output_folder.mkdir(parents=True, exist_ok=True)
 
-    with AnyReader([bag_file]) as reader:
+    with AnyReader([bag_file], default_typestore=typestore) as reader:
         check_requested_topics(reader, config, ignore_missing)
         
         for data in config:
