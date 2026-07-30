@@ -1,25 +1,12 @@
 import wave
 from pathlib import Path
 import numpy as np
-from rosbags.typesys import get_types_from_msg, get_typestore, Stores
 
 from src.base_extractor import CSVExtractor
 
-AUDIO_DATA_MSG = """
-uint8[] data
-"""
-
-AUDIO_DATA_STAMPED_MSG = """
-std_msgs/Header header
-audio_common_msgs/AudioData audio
-"""
-
+# Message definitions live in src/typestore.py, which is handed to the reader.
 AUDIO_CHANNELS = 1
 AUDIO_SAMPLE_WIDTH = 2
-
-typestore = get_typestore(Stores.LATEST)
-typestore.register(get_types_from_msg(AUDIO_DATA_MSG, "audio_common_msgs/msg/AudioData"))
-typestore.register(get_types_from_msg(AUDIO_DATA_STAMPED_MSG, "audio_common_msgs/msg/AudioDataStamped"))
 
 
 class AudioExtractor(CSVExtractor):
