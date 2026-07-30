@@ -8,6 +8,7 @@ from pathlib import Path
 from rosbags.highlevel import AnyReader
 
 from src.utils import Colors
+from src.typestore import typestore
 from src.types.anymal_state import AnymalStateExtractor
 from src.types.anymal_actuators import AnymalActuatorsExtractor
 from src.types.audio import AudioExtractor
@@ -20,7 +21,6 @@ from src.types.pose import PoseExtractor
 from src.types.point import PointExtractor
 from src.types.point_cloud import PointCloudExtractor
 from src.types.tf import TFExtractor
-from src.types.theodolite import TheodoliteExtractor
 from src.types.twist import TwistExtractor
 
 
@@ -36,7 +36,6 @@ EXTRACTORS = {
     "basic": BasicExtractor,
     "audio": AudioExtractor,
     "tf": TFExtractor,
-    "theodolite": TheodoliteExtractor,
     "anymal_state": AnymalStateExtractor,
     "anymal_actuators": AnymalActuatorsExtractor,
 }
@@ -85,7 +84,7 @@ def extract_data(bag_file, config, output_folder, overwrite=False, ignore_missin
     output_folder = Path(output_folder)
     output_folder.mkdir(parents=True, exist_ok=True)
 
-    with AnyReader([bag_file]) as reader:
+    with AnyReader([bag_file], default_typestore=typestore) as reader:
         check_requested_topics(reader, config, ignore_missing)
         
         for data in config:

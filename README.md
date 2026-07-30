@@ -65,7 +65,9 @@ The following types are currently implemented in the tool:
 
 **image** -> Messages of type `sensor_msgs/msg/Image` or `sensor_msgs/msg/CompressedImage`, that will be directly decoded and saved as single images named by timestamps.
 
-**anymal_state** -> ANYmal robot state messages containing odometry, joint states, and contact information.
+**anymal_state** -> Messages of type `anymal_msgs/msg/AnymalState`, containing odometry, joint states, and contact information.
+
+**anymal_actuators** -> Messages of type `series_elastic_actuator_msgs/msg/SeActuatorReadings`, containing the measured and commanded state of each ANYdrive actuator.
 
 **tf** -> Extract TF transforms from `/tf` and `/tf_static` topics between a base frame and multiple target frames to CSV files.
 
@@ -91,6 +93,20 @@ ANYmal state extraction produces three CSV files:
 - **anymal_odom.csv** - Position, orientation (Euler angles), linear and angular velocity
 - **anymal_joints.csv** - Joint position, velocity, acceleration, and effort for each joint
 - **anymal_contacts.csv** - Contact state, position, and force for each foot
+
+
+## ANYmal Actuators
+
+ANYmal actuator extraction produces two CSV files, with one column per joint per field:
+- **measured.csv** - Joint position, velocity, acceleration, torque, and motor current
+- **commanded.csv** - Control mode, setpoint position, velocity, torque, and current
+
+Actuators are named from the joint ordering in the robot setup file (`LF_HAA`, `LF_HFE`, ... `RH_KFE`).
+
+
+## Custom Message Types
+
+Some extractors read messages that are not part of stock ROS (`anymal_msgs`, `series_elastic_actuator_msgs`, `audio_common_msgs`). ROS1 bags and MCAP files embed their message definitions, so these work out of the box. ROS2 sqlite3 bags do not, and fall back to the definitions registered in `src/typestore.py` — add yours there if you hit a `Bag contains no type definitions` error.
 
 
 ## TF Transforms

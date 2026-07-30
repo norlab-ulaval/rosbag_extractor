@@ -34,7 +34,7 @@
   topic: /sensors/imu
   folder: imu
 
-- type: theodolite
+- type: basic
   topic: /theodolite_data
   folder: theodolite
 
