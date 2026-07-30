@@ -108,11 +108,9 @@ class ImageExtractor(FolderExtractor):
             self._save_video_timestamps()
 
     def _save_video_timestamps(self):
-        timestamps_file = self.save_folder / "timestamps.csv"
-        pd.DataFrame({
-            "frame": range(len(self._video_timestamps)),
-            "timestamp": self._video_timestamps,
-        }).to_csv(timestamps_file, index=False)
+        timestamps_file = self.save_folder / "timestamps.txt"
+        timestamps_file.write_text(
+            "".join(f"{int(t)}\n" for t in self._video_timestamps))
         print(f"Saved frame timestamps to {timestamps_file}")
     
     def _apply_transformations(self, image, encoding):
