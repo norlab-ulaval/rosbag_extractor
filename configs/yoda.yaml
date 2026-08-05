@@ -1,0 +1,27 @@
+- type: image
+  topic: /basler/camera_1/image_raw
+  folder: images_left
+  args:
+    extension: png
+    rectify: false
+    scale: 1.0
+    gray_scale: false
+    debayer: false
+
+- type: image
+  topic: /basler/camera_2/image_raw
+  folder: images_right
+  args:
+    extension: png
+    rectify: false
+    scale: 1.0
+    gray_scale: false
+    debayer: false
+
+- type: basic
+  topic: /basler/camera_1/image_meta
+  folder: images_meta_left
+
+- type: basic
+  topic: /basler/camera_2/image_meta
+  folder: images_meta_right

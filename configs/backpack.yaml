@@ -1,46 +1,46 @@
-- type: image
-  topic: /stereo/camera1/image_compressed
-  folder: camera_left
-  args:
-    extension: png
-    rectify: false
-    scale: 1.0
-    debayer: false
-    convert_12to8bits: false
-    brackets: [1.0, 2.0, 4.0, 8.0, 16.0, 32.0]
-    basler_decompress: true
+# - type: image
+#   topic: /stereo/camera1/image_compressed
+#   folder: camera_left
+#   args:
+#     extension: png
+#     rectify: false
+#     scale: 1.0
+#     debayer: false
+#     convert_12to8bits: false
+#     brackets: [1.0, 2.0, 4.0, 8.0, 16.0, 32.0]
+#     basler_decompress: true
 
-- type: image
-  topic: /stereo/camera2/image_compressed
-  folder: camera_right
-  args:
-    extension: png
-    rectify: false
-    scale: 1.0
-    debayer: false
-    convert_12to8bits: false
-    brackets: [1.0, 2.0, 4.0, 8.0, 16.0, 32.0]
-    basler_decompress: true
+# - type: image
+#   topic: /stereo/camera2/image_compressed
+#   folder: camera_right
+#   args:
+#     extension: png
+#     rectify: false
+#     scale: 1.0
+#     debayer: false
+#     convert_12to8bits: false
+#     brackets: [1.0, 2.0, 4.0, 8.0, 16.0, 32.0]
+#     basler_decompress: true
 
-- type: basic
-  topic: /stm32_parameters
-  folder: stm32_parameters
+# - type: basic
+#   topic: /stm32_parameters
+#   folder: stm32_parameters
 
-- type: basic
-  topic: /stereo/camera1/metadata
-  folder: camera_left_metadata
+# - type: basic
+#   topic: /stereo/camera1/metadata
+#   folder: camera_left_metadata
 
-- type: basic
-  topic: /stereo/camera2/metadata
-  folder: camera_right_metadata
+# - type: basic
+#   topic: /stereo/camera2/metadata
+#   folder: camera_right_metadata
 
-- type: basic
-  topic: /stereo/camera1/static_parameters
-  folder: camera_left_static_parameters
+# - type: basic
+#   topic: /stereo/camera1/static_parameters
+#   folder: camera_left_static_parameters
 
-- type: basic
-  topic: /stereo/camera2/static_parameters
-  folder: camera_right_static_parameters
+# - type: basic
+#   topic: /stereo/camera2/static_parameters
+#   folder: camera_right_static_parameters
   
 - type: imu
   topic: /MTI_imu/data
@@ -48,15 +48,15 @@
   args:
     euler: true
 
-- type: gnss
-  topic: /gps_data_raw
-  folder: gnss
+# - type: gnss
+#   topic: /gps_data_raw
+#   folder: gnss
 
-- type: basic
-  topic: /nmea_sentence
-  folder: gnss_nmea_raw
+# - type: basic
+#   topic: /nmea_sentence
+#   folder: gnss_nmea_raw
 
-- type: point_cloud
-  topic: /velodyne_points
-  folder: lidar
+# - type: point_cloud
+#   topic: /velodyne_points
+#   folder: lidar
 
