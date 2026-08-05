@@ -57,6 +57,8 @@ The following types are currently implemented in the tool:
 
 **pose** -> Messages of type `geometry_msgs/msg/Pose` or `geometry_msgs/msg/PoseStamped`, can be extracted to a single CSV file including timestamps.
 
+**point** -> Messages of type `geometry_msgs/msg/Point` or `geometry_msgs/msg/PointStamped`, can be extracted to a single CSV file including timestamps.
+
 **twist** -> Messages of type `geometry_msgs/msg/Twist` or `geometry_msgs/msg/TwistStamped`, can be extracted to a single CSV file including timestamps.
 
 **point_cloud** -> Messages of type `sensor_msgs/msg/PointCloud2`, can be extracted to a single CSV file per point cloud, named by timestamp.
@@ -82,6 +84,13 @@ Images extraction include extra parameters to achieve the desired output:
 | convert_12to8bits | bool      | `false` | Whether to convert 12 bits images to 8 bits before saving                               |
 | brackets          | list[int] | `None`  | Sort extracted images in specified brackets folder (will look for <cam_topic>/metadata) |
 | basler_decompress | bool      | `false` | (Basler only) Decompress images, message type should be packets                         |
+
+When `video` is enabled, a `timestamps.txt` is written next to the video, holding the header timestamp of each frame (one per line, in nanoseconds) so frames can be realigned with the other extracted data.
+
+
+## Custom Message Types
+
+Some topics carry messages that are not part of stock ROS (`audio_common_msgs`, robot-specific packages, ...). ROS1 bags and MCAP files embed their message definitions, so these work out of the box. ROS2 sqlite3 bags do not, and fall back to the definitions registered in `src/typestore.py` — add yours there if you hit a `Bag contains no type definitions` error.
 
 
 ## TF Transforms

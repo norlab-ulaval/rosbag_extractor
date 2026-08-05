@@ -85,37 +85,40 @@ class ImageExtractor(FolderExtractor):
         self.gray_scale = self.args.get("gray_scale", False)
         self.video = self.args.get("video", False)
         self._video_writer = None
-    
+        self._video_timestamps = []
+
     def _pre_extract(self, reader):
         self.calib = self._get_camera_info(reader)
         self._save_camera_calibration(self.calib)
         if self.video:
             self._video_fps = self._compute_fps(reader)
             print(f"Estimated FPS for topic {self.topic_name}: {self._video_fps:.2f}")
-    
-    def _post_extract(self, reader):
-        if self.args.get("brackets"):
-            self._sort_bracket_images(reader)
-    
-    def _post_extract(self, reader):
-        if self.args.get("brackets"):
-            self._sort_bracket_images(reader)
-    
+
     def _process_message(self, msg, ros_time, msgtype):
         np_image = self._decompress_image(msg) if self.basler_decompress else self._image_to_numpy(msg)
         encoding = getattr(msg, 'encoding', None)
         np_image = self._apply_transformations(np_image, encoding)
+        timestamp = extract_timestamp(msg)
         if self.video:
             self._write_video_frame(np_image)
+            self._video_timestamps.append(timestamp)
         else:
-            timestamp = extract_timestamp(msg)
             self._save_image(np_image, timestamp)
         return True
-    
+
     def _post_extract(self, reader):
         if self._video_writer is not None:
             self._video_writer.release()
             print(f"Saved video to {self._video_file}")
+            self._save_video_timestamps()
+        if self.args.get("brackets"):
+            self._sort_bracket_images(reader)
+
+    def _save_video_timestamps(self):
+        timestamps_file = self.save_folder / "timestamps.txt"
+        timestamps_file.write_text(
+            "".join(f"{int(t)}\n" for t in self._video_timestamps))
+        print(f"Saved frame timestamps to {timestamps_file}")
     
     def _apply_transformations(self, image, encoding):
         if self.convert_12to8bits and image.dtype == np.uint16:
@@ -160,8 +163,16 @@ class ImageExtractor(FolderExtractor):
     
     def _get_camera_info(self, reader):
         topic_base = self.topic_name.replace("/compressed", "")
-        camera_info_topic = "/".join(topic_base.split("/")[:-1] + ["camera_info"])
+        namespace = "/".join(topic_base.split("/")[:-1])
+        camera_info_topic = f"{namespace}/camera_info"
         connections = [x for x in reader.connections if x.topic == camera_info_topic]
+
+        if not connections:
+            # Handle suffixed variants like camera_info_throttle
+            connections = [
+                x for x in reader.connections
+                if x.topic.startswith(f"{namespace}/camera_info")
+            ]
 
         if not connections:
             if self.rectify:
