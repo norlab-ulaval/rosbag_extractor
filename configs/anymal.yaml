@@ -4,10 +4,6 @@
   args:
     base_frame: odom
     target_frames:
-      - LF_FOOT
-      - RF_FOOT
-      - LH_FOOT
-      - RH_FOOT
       - base
     euler: true
     sample_rate: 100.0
@@ -18,9 +14,9 @@
   args:
     base_frame: base
     target_frames:
-      - wide_angle_camera_front_camera
+      - pylon_camera
     euler: true
-    sample_rate: 1.0
+    sample_rate: 0.1
 
 - type: anymal_state
   topic: /legged_odometry/anymal_state
@@ -39,9 +35,10 @@
   folder: theodolite
 
 - type: image
-  topic: /wide_angle_camera_front/image_color_throttle
-  folder: camera_front
+  topic: /pylon_camera_node/image_raw
+  folder: front_center_camera
   args:
     extension: png
     rectify: true
     video: true
+    debayer: true
