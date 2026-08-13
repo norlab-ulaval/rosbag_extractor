@@ -15,6 +15,9 @@
     base_frame: base
     target_frames:
       - pylon_camera
+      - lidar
+      - wide_angle_camera_rear_camera_parent
+      - wide_angle_camera_front_camera_parent
     euler: true
     sample_rate: 0.1
 
@@ -42,3 +45,23 @@
     rectify: true
     video: true
     debayer: true
+
+- type: image
+  topic: /wide_angle_camera_rear/image_mono/compressed
+  folder: wide_angle_rear
+  args:
+    extension: png
+    rectify: true
+    video: true
+
+- type: image
+  topic: /wide_angle_camera_front/image_mono/compressed
+  folder: wide_angle_front
+  args:
+    extension: png
+    rectify: true
+    video: true
+
+- type: point_cloud
+  topic: /lidar/point_cloud
+  folder: lidar
