@@ -22,8 +22,26 @@ class TFExtractor(FolderExtractor):
         
         self.euler = self.args.get('euler', False)
         self.sample_rate = self.args.get('sample_rate', None)
-    
-    def _pre_extract(self, reader):      
+
+    def _check_overwrite(self):
+        self._output_files = {
+            target: self._output_path(target) for target in self.target_frames
+        }
+        if not self.overwrite:
+            pending = [target for target, path in self._output_files.items() if not path.exists()]
+            if not pending:
+                print(f"Output files for all target frames already exist in {self.save_folder}. Skipping...")
+                return False
+            self.target_frames = pending
+        self.save_folder.mkdir(parents=True, exist_ok=True)
+        return True
+
+    def _output_path(self, target_frame):
+        safe_base = self.base_frame.replace('/', '_').lower()
+        safe_target = target_frame.replace('/', '_').lower()
+        return self.save_folder / f"{safe_base}_to_{safe_target}.csv"
+
+    def _pre_extract(self, reader):
         self.tf_buffer = TFBuffer()
         self._load_static_transforms(reader)
         
@@ -61,17 +79,14 @@ class TFExtractor(FolderExtractor):
         return None
     
     def _save_data(self, data):
-        safe_base = self.base_frame.replace('/', '_').lower()
         columns = ['timestamp', 'x', 'y', 'z', 'roll', 'pitch', 'yaw'] if self.euler else \
                   ['timestamp', 'x', 'y', 'z', 'qx', 'qy', 'qz', 'qw']
-        
+
         for target_frame in self.target_frames:
             transform_data = self.frame_data[target_frame]
             if transform_data:
-                safe_target = target_frame.replace('/', '_').lower()
-                output_file = self.save_folder / f"{safe_base}_to_{safe_target}.csv"
                 df = pd.DataFrame(transform_data, columns=columns)
-                df.to_csv(output_file, index=False)
+                df.to_csv(self._output_files[target_frame], index=False)
             else:
                 print(f"No transforms found for target frame '{target_frame}' relative to base frame '{self.base_frame}'.")
     
