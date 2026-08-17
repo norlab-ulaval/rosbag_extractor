@@ -5,8 +5,13 @@ A python utility to convert rosbags into human-readable data.
 
 # Installation
 
-It is suggested to install the module with pip: 
+It is suggested to install the module with pip : 
 
+```bash
+pip install git+https://github.com/norlab-ulaval/rosbag_extractor
+```
+
+Or clone it locally and run :
 ```bash
 pip install -e .
 ```
